@@ -1,0 +1,67 @@
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+body
+{
+    height: 100%;
+    background: rgb(255, 255, 255) none;
+    color: rgb(0, 0, 0);
+    font: normal normal normal 13pt/normal Helvetica, Arial, sans-serif;
+}
+
+body *
+{
+    line-height: 1.4em;
+}
+
+.column
+{
+    margin: 0 auto;
+    padding: 0 15px;
+    width: 920px;
+}
+
+#main
+{
+    height: 100%;
+    min-height: 100%;
+/*    margin: 0 auto -8.6em;*/
+    margin: 0 auto;
+}
+
+#header
+{
+    height: 115px;
+    margin-bottom: 0;
+    background: #EDEDED url(../images/header.png);
+    background-image: -moz-linear-gradient(top, #FBFBFB, #EDEDED 98%, #DDDDDD);
+    background-image: -webkit-gradient(linear, center top, center bottom, from(#FBFBFB), to(#DDDDDD), color-stop(.98,#EDEDED));
+}
+
+#header .logo
+{
+    float: left;
+    padding-top: 22px;
+}
+
+#footer
+{
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+    padding-bottom: 1em;
+}
+
+a
+{
+    color: rgb(65, 131, 196);
+    text-decoration: none;
+}
+
+#header a
+{
+    color: rgb(255, 255, 255);
+}
