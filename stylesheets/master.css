@@ -1,34 +1,7 @@
-*
-{
-    margin: 0;
-    padding: 0;
-}
-
-body
-{
-    height: 100%;
-    background: rgb(255, 255, 255) none;
-    color: rgb(0, 0, 0);
-    font: normal normal normal 13pt/normal Helvetica, Arial, sans-serif;
-}
-
-body *
-{
-    line-height: 1.4em;
-}
-
-.column
-{
-    margin: 0 auto;
-    padding: 0 15px;
-    width: 920px;
-}
-
 #main
 {
     height: 100%;
     min-height: 100%;
-/*    margin: 0 auto -8.6em;*/
     margin: 0 auto;
 }
 
@@ -47,6 +20,11 @@ body *
     padding-top: 22px;
 }
 
+#header a
+{
+    color: rgb(255, 255, 255);
+}
+
 #footer
 {
     width: 100%;
@@ -55,13 +33,75 @@ body *
     padding-bottom: 1em;
 }
 
+#fineprint
+{
+/*    font-family: Helvetica, Arial, sans-serif;*/
+    font-size: 10pt;
+}
+
+#posts ul
+{
+    list-style: none;
+}
+
+.column
+{
+/*    margin: 0 auto;*/
+    margin: 0 165px;
+    padding: 0 15px;
+/*    width: 920px;*/
+    max-width: 50em;
+}
+
+.post-date
+{
+    display: inline-block;
+    margin-left: -165px;
+    width: 155px;
+/*    font-family: Helvetica, Arial, sans-serif;*/
+    text-align: right;
+}
+
+.post-title
+{
+    display: inline-block;
+    margin-left: 10px;
+/*    font-family: Helvetica, Arial, sans-serif;*/
+}
+
+body
+{
+    height: 100%;
+    background: rgb(255, 255, 255) none;
+    color: rgb(0, 0, 0);
+/*    font: normal normal normal 13pt/normal Times serif;*/
+    font: normal normal normal 13pt/normal Helvetica, Arial, sans-serif;
+}
+
+body *
+{
+    line-height: 1.2em;
+}
+
+p
+{
+    margin-top: 0.8em;
+}
+
+h1
+{
+    margin: 0.5em 0 0.3em;
+/*    font-family: Helvetica, Arial, sans-serif;*/
+}
+
 a
 {
     color: rgb(65, 131, 196);
     text-decoration: none;
 }
 
-#header a
+*
 {
-    color: rgb(255, 255, 255);
+    margin: 0;
+    padding: 0;
 }

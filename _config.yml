@@ -1,1 +1,4 @@
+# server configuration
+auto: true
+lsi: true
 pygments: true
