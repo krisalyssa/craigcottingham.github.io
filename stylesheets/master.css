@@ -7,6 +7,7 @@
 
 #header
 {
+    position: relative;
     height: 115px;
     margin-bottom: 0;
     background: #EDEDED url(../images/header.png);
@@ -16,8 +17,13 @@
 
 #header .logo
 {
-    float: left;
     padding-top: 22px;
+}
+
+#header .linkbar
+{
+    position: absolute;
+    bottom: 0;
 }
 
 #header a
@@ -35,38 +41,71 @@
 
 #fineprint
 {
-/*    font-family: Helvetica, Arial, sans-serif;*/
     font-size: 10pt;
 }
 
 #posts ul
 {
+    position: relative;
     list-style: none;
+}
+
+#post
+{
+    position: relative;
 }
 
 .column
 {
-/*    margin: 0 auto;*/
     margin: 0 165px;
     padding: 0 15px;
-/*    width: 920px;*/
     max-width: 50em;
+}
+
+.linkbar ul
+{
+    list-style: none;
+    background: #888888 none;
+    color: rgb(255, 255, 255);
+}
+
+.linkbar ul li
+{
+    display: inline-block;
+    height: 1.2em;
+    margin: 0;
+    padding: 0.4em 1em;
+}
+
+ul.metadata
+{
+    margin-top: 1em;
+    font-size: 10pt;
+    font-style: italic;
+    list-style: none;
+    
 }
 
 .post-date
 {
     display: inline-block;
+    position: absolute;
+    left: 0;
+    width: 150px;
+    margin-top: 0.9em;
     margin-left: -165px;
-    width: 155px;
-/*    font-family: Helvetica, Arial, sans-serif;*/
     text-align: right;
+}
+
+li div.post-date
+{
+    margin-top: 0;
 }
 
 .post-title
 {
     display: inline-block;
-    margin-left: 10px;
-/*    font-family: Helvetica, Arial, sans-serif;*/
+    margin-left: 0px;
 }
 
 body
@@ -74,7 +113,6 @@ body
     height: 100%;
     background: rgb(255, 255, 255) none;
     color: rgb(0, 0, 0);
-/*    font: normal normal normal 13pt/normal Times serif;*/
     font: normal normal normal 13pt/normal Helvetica, Arial, sans-serif;
 }
 
@@ -91,7 +129,7 @@ p
 h1
 {
     margin: 0.5em 0 0.3em;
-/*    font-family: Helvetica, Arial, sans-serif;*/
+    font-size: 2em;
 }
 
 a

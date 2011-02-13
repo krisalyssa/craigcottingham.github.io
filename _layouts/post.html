@@ -2,7 +2,12 @@
 layout: default
 ---
 <div id="post">
+  <div class="post-date">{{ page.date | date: "%Y-%m-%d" }}</div>
   {{ content }}
+  <ul class="metadata">
+    <li>posted: {{ page.date }}</li>
+    <li>tags: {{ page.tags | join " " }}</li>
+  </ul>
 </div>
 {% if !site.related_posts.empty? %}
 <div id="related">

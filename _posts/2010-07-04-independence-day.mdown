@@ -1,6 +1,9 @@
 ---
 layout: post
 title: Independence Day
+tags:
+  - intro
+  - first
 ---
 # {{ page.title }}
 
