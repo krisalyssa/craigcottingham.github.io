@@ -10,13 +10,17 @@
     <link rel="stylesheet" href="/stylesheets/master.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="/stylesheets/syntax.css" type="text/css" />
     <script src="http://www.google.com/jsapi" type="text/javascript" />
+    <script type="text/javascript" src="http://use.typekit.com/dvb2nak.js"></script>
+    <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
   </head>
   <body>
     <div id="main">
-      <div id="header">
+      <div class="header">
         <div class="column">
           <div class="logo">
-            <a href="/"><img src="/images/logo.png" alt="github/CraigCottingham" /></a>
+            <a href="/">
+              <span class="light-gray">this</span><span class="dark-gray">is</span><span class="black">github.com/</span><span class="blue">CraigCottingham</span>
+            </a>
           </div>
           <div class="linkbar">
             <ul>
@@ -25,17 +29,17 @@
           </div>
         </div>
       </div>
-      <div id="content">
+      <div class="content">
         <div class="column">
           {{ content }}
         </div>
       </div>
-      <div id="footer">
+      <div class="footer">
         <div class="column">
-          <div id="info">
-            <div id="links">
+          <div class="info">
+            <div class="links">
             </div>
-            <div id="fineprint">
+            <div class="fineprint">
               &copy; 2010-2011 Craig S. Cottingham. All rights reserved.
               Hosted at <a href="http://github.com/">Github</a>.
               Powered by <a href="https://github.com/mojombo/jekyll/">Jekyll</a>.
