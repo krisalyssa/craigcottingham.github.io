@@ -1,0 +1,56 @@
+---
+layout: post
+title: "A Behavior Driven Development Primer"
+tags:
+  - bdd
+  - cucumber
+  - rails
+  - rspec
+  - ruby
+  - testing
+---
+# {{ page.title }}
+
+There was a really nice [article by Sarah Mei](http://www.sarahmei.com/blog/2010/05/29/outside-in-bdd/)
+last year describing her process for [behavior driven development](http://en.wikipedia.org/wiki/Behavior_Driven_Development).
+I really recommend reading it, because it shows how she alternates between [RSpec](http://rspec.info/)
+and [Cucumber](http://cukes.info/), writing features, specs, and code from the outside in.
+
+Unfortunately, I'm still new to [Rails](http://rubyonrails.org/), RSpec, and Cucumber, and her
+article is aimed at a slightly more experienced developer than I currently am. I have decided to go
+through the same process, starting from scratch, and document what I learn as I learn it.
+
+## Getting Started
+
+There are lots of perfectly useful tutorials on getting started with Rails, so I won't go into
+a lot of detail there. I assume that you already have Ruby and Rails installed; as of the time of
+this writing, I'm using versions 1.9.2 and 3.0.4 respectively.
+
+Create a new Rails application:
+
+{% highlight sh %}
+    $ rails new bdd
+    $ cd bdd
+    $ git init .
+    $ git commit -a -m 'Initial import'
+{% endhighlight %}
+
+Now run `rails server` and point your browser at http://localhost:3000/ to make sure that it runs.
+
+Edit `Gemfile` and add these lines to the bottom:
+
+{% highlight ruby %}
+    group :development, :test do
+      gem "rspec-rails", "~> 2.4"
+      gem 'capybara'
+      gem 'database_cleaner'
+      gem 'cucumber-rails'
+      gem 'cucumber', '>= 0.10.0'
+      gem 'spork'
+      gem 'launchy'
+    end
+{% endhighlight %}
+
+Then run `bundle install` to update gems. Run `rails server` again as a sanity check.
+
+That's a start. Next I'll get into creating features and specs.
