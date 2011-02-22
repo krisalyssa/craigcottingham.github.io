@@ -5,27 +5,73 @@
     margin: 0 auto;
 }
 
+.column
+{
+    margin: 0 165px;
+    padding: 0 15px;
+    max-width: 50em;
+}
+
+.content
+{
+/*    padding-top: 0.5em;*/
+    padding-top: 7.5em;
+    padding-bottom: 3em;
+}
+
+.fineprint
+{
+    font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
+    font-size: 11pt;
+}
+
+.footer
+{
+    position: fixed;
+    z-index: 10;
+    bottom: 0;
+    width: 100%;
+    padding: 0.5em 0;
+    background: #EDEDED;
+    background: -moz-linear-gradient(top, #DDDDDD, #FBFBFB);
+    background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#DDDDDD), to(#FBFBFB));
+}
+
 .header
 {
-    position: relative;
-    height: 115px;
+/*    position: relative;*/
+/*    height: 115px;*/
+    position: fixed;
+    top: 0;
+    z-index: 10;
+    height: 7em;
+    width: 100%;
     margin-bottom: 0;
     background: #EDEDED;
     background: -moz-linear-gradient(top, #FBFBFB, #DDDDDD);
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#FBFBFB), to(#DDDDDD));
 }
 
-.logo
+.header a
 {
-    padding-top: 22px;
-    font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
-    font-size: 3em;
+    color: rgb(255, 255, 255);
+}
+
+.highlight
+{
+    margin-top: 0.8em;
+    padding: 0.5em;
+    border: 1px black solid;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 }
 
 .linkbar
 {
     position: absolute;
     bottom: 0;
+    height: 1.1em;
     font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
     font-size: 1.1em;
 }
@@ -37,12 +83,9 @@
     background: -moz-linear-gradient(top, #888888, #CCCCCC);
     background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#888888), to(#CCCCCC));
     color: rgb(255, 255, 255);
-    -webkit-border-top-left-radius: 8px;
-    -webkit-border-top-right-radius: 8px;
-    -moz-border-radius-topleft: 8px;
-    -moz-border-radius-topright: 8px;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 }
 
 .linkbar ul li
@@ -51,53 +94,33 @@
 /*    height: 1em;*/
     margin: 0;
     padding: 0.4em 1em;
+    -webkit-border-top-left-radius: 8px;
+    -webkit-border-top-right-radius: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
 }
 
-.header a
+.logo
 {
-    color: rgb(255, 255, 255);
-}
-
-.footer
-{
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    padding-bottom: 1em;
-}
-
-.fineprint
-{
+    padding-top: 22px;
     font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
-    font-size: 11pt;
+    font-size: 3em;
 }
 
-.posts ul
-{
-    position: relative;
-    list-style: none;
-}
-
-.post
-{
-    position: relative;
-}
-
-.column
-{
-    margin: 0 165px;
-    padding: 0 15px;
-    max-width: 50em;
-}
-
-ul.metadata
+.metadata
 {
     margin-top: 1em;
     font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
     font-size: 11pt;
     font-style: italic;
     list-style: none;
-    
+}
+
+.post
+{
+    position: relative;
 }
 
 .post-date
@@ -112,15 +135,21 @@ ul.metadata
     text-align: right;
 }
 
-li div.post-date
-{
-    margin-top: 0;
-}
-
 .post-title
 {
     display: inline-block;
     margin-left: 0px;
+}
+
+.posts ul
+{
+    position: relative;
+    list-style: none;
+}
+
+li div.post-date
+{
+    margin-top: 0;
 }
 
 .black
@@ -143,12 +172,25 @@ li div.post-date
     color: rgb(171, 171, 171);
 }
 
+*
+{
+    margin: 0;
+    padding: 0;
+}
+
+a
+{
+    color: rgb(65, 131, 196);
+    text-decoration: none;
+}
+
 body
 {
     height: 100%;
     background: rgb(255, 255, 255) none;
     color: rgb(0, 0, 0);
-    font: normal normal normal 13pt/normal Helvetica, Arial, sans-serif;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 13pt;
 }
 
 body *
@@ -156,9 +198,9 @@ body *
     line-height: 1.2em;
 }
 
-p
+code
 {
-    margin-top: 0.8em;
+    font-family: "anonymous-pro-1", "anonymous-pro-2", monospace;
 }
 
 h1
@@ -170,17 +212,12 @@ h1
 
 h2
 {
+    margin: 0.5em 0 0.3em;
     font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
+    font-size: 1.5em;
 }
 
-a
+p
 {
-    color: rgb(65, 131, 196);
-    text-decoration: none;
-}
-
-*
-{
-    margin: 0;
-    padding: 0;
+    margin-top: 0.8em;
 }
