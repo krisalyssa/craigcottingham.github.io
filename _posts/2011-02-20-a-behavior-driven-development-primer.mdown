@@ -9,8 +9,6 @@ tags:
   - ruby
   - testing
 ---
-# {{ page.title }}
-
 There was a really nice [article by Sarah Mei](http://www.sarahmei.com/blog/2010/05/29/outside-in-bdd/)
 last year describing her process for [behavior driven development](http://en.wikipedia.org/wiki/Behavior_Driven_Development).
 I really recommend reading it, because it shows how she alternates between [RSpec](http://rspec.info/)

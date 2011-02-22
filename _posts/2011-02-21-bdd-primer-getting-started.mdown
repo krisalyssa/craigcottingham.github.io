@@ -9,8 +9,6 @@ tags:
   - ruby
   - testing
 ---
-# {{ page.title }}
-
 There are lots of perfectly useful tutorials on getting started with Rails, so I won't go into
 a lot of detail there. I assume that you already have Ruby and Rails installed; as of the time of
 this writing, I'm using versions 1.9.2 and 3.0.4 respectively.

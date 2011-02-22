@@ -5,8 +5,6 @@ tags:
   - intro
   - first
 ---
-# {{ page.title }}
-
 I was all set for my first post to this blog to be a pastiche of the
 [Declaration of Independence](http://en.wikipedia.org/wiki/United_States_Declaration_of_Independence),
 but I realized it was going to sound like I was actually declaring independence from my
