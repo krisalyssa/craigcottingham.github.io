@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "An Aside: TicGit"
+updated: 2011-03-04
 tags:
   - git
   - ticgit
@@ -9,8 +10,12 @@ tags:
 [Larkware Shots](http://larkware.com/shots) recently mentioned
 [TicGit](https://github.com/jeffWelling/ticgit), a Git-based ticket system that keeps all of your
 tickets in their own branch of your code's repository. That doesn't make sense for large projects
-with multiple repositories <span id="fnr-2011-03-02-ticgit-1"></span>[(1)][fn1], but for my little
-learning exercise here, it should work just fine.
+with multiple repositories
+{% fn 1 %}
+  At least, it doesn't make sense to me. I come from an enterprise Java background,
+  and I'm still learning The Git Way.
+{% endfn %},
+but for my little learning exercise here, it should work just fine.
 
 ## Installing TicGit
 
@@ -27,7 +32,10 @@ To create a ticket:
 {% endhighlight %}
 
 As with Git, if you don't specify a message on the command line, you're thrown into your
-editor (in my case, Vim <span id="fnr-2011-03-02-ticgit-2"></span>[(2)][fn2]).
+editor (in my case, Vim
+{% fn 2 %}
+  Don't go there. Just... just don't.
+{% endfn %}).
 Of whatever text you enter, the first line is taken as the ticket's title and the rest is
 the initial comment. Tags can be entered on the `tags:` line.
 
@@ -44,26 +52,4 @@ the initial comment. Tags can be entered on the `tags:` line.
 
 We'll use this ticket as our starting point for behavior driven development.
 
-<div class="footnotes">
-  <h2>Footnotes</h2>
-  <ol>
-    <li id="fn-2011-03-02-ticgit-1">
-      <p>
-        At least, it doesn't make sense to me. I come from an enterprise Java background,
-        and I'm still learning The Git Way.
-        &nbsp;
-        <a href="#fnr-2011-03-02-ticgit-1" class="fn-backlink" title="Jump back to footnote 1 in the text.">&#8617;</a>
-      </p>
-    </li>
-    <li id="fn-2011-03-02-ticgit-2">
-      <p>
-        Don't go there. Just... just don't.
-        &nbsp;
-        <a href="#fnr-2011-03-02-ticgit-2" class="fn-backlink" title="Jump back to footnote 2 in the text.">&#8617;</a>
-      </p>
-    </li>
-  </ol>
-</div>
-
-[fn1]: #fn-2011-03-02-ticgit-1
-[fn2]: #fn-2011-03-02-ticgit-2
+{% fns %}

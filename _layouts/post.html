@@ -6,7 +6,10 @@ layout: default
   <h1>{{ page.title }}</h1>
   {{ content }}
   <ul class="metadata">
-    <li><strong>posted:</strong> {{ page.date }}</li>
+    <li><strong>posted:</strong> {{ page.date | date: "%Y-%m-%d" }}</li>
+    {% if page.updated != page.date %}
+    <li><strong>updated:</strong> {{ page.updated | date: "%Y-%m-%d" }}</li>
+    {% endif %}
     <li><strong>tags:</strong> {{ page.tags | join " " }}</li>
   </ul>
 </div>
