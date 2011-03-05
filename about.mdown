@@ -17,10 +17,7 @@ Hosted at [Github](http://github.com/).
 Powered by [Jekyll](https://github.com/mojombo/jekyll/).
 
 Makes liberal use of [Markdown](http://daringfireball.net/projects/markdown/)
-by John Gruber. Additionally, I have copied the footnote style he uses at
-[Daring Fireball](http://daringfireball.net/), at least until I can hack together something
-of my own. (Update on 2009-03-05: I'm trying kramdown instead of Maruku for Markdown processing,
-as it claims to support footnotes.)
+by John Gruber.
 
 Tools include [TextMate](http://macromates.com/) and Safari. The rest is command-line stuff,
 though I've been giving [Tower](http://www.git-tower.com/) a whirl lately.

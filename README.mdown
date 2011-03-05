@@ -4,15 +4,11 @@ This is my development blog, relating to projects stored in repositories at Gith
 It's also a place for me to document my learning process in new directions, and to
 record tips and tricks I don't otherwise want to forget.
 
-It's pretty much a bog-standard Jekyll site, with a couple of modifications.
+It's pretty much a bog-standard Jekyll site, with a few modifications:
 
-* I'm using a fork of mojombo/jekyll with changes from ascarter/jekyll merged in.
-  This gives me a timestamp for when a post was updated as well as when it was created.
-  (Though now that I think about it, what I think I'm getting from the ascarter changes
-  may really be coming from the original code. I should investigate.)
-* I have added two custom Liquid tags for generating and collating footnotes.
-  (Unfortunately, it appears that the Jekyll code used for Github Pages doesn't load
-  plugins for security reasons. I'm going to have to rethink this.)
+* Markdown processing is done by [kramdown](http://kramdown.rubyforge.org/);
+  I started using it for its footnote support, but I'll probably find other things about it
+  that I like.
 
 ## About this blog
 

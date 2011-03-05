@@ -1,10 +1,11 @@
 # server configuration
+# defaults used by Github Pages
 destination: ./_site
 lsi: false
 pygments: true
 safe: true
 source: .
-
+# my own overrides
 auto: true
 markdown: kramdown
 permalink: /:year/:month/:day/:title.html
