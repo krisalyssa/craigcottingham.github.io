@@ -1,5 +1,10 @@
 # server configuration
-auto: true
-lsi: true
-permalink: /:year/:month/:day/:title.html
+destination: ./_site
+lsi: false
 pygments: true
+safe: true
+source: .
+
+auto: true
+markdown: kramdown
+permalink: /:year/:month/:day/:title.html

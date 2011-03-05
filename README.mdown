@@ -1,0 +1,19 @@
+# craigcottingham.github.com
+
+This is my development blog, relating to projects stored in repositories at Github.
+It's also a place for me to document my learning process in new directions, and to
+record tips and tricks I don't otherwise want to forget.
+
+It's pretty much a bog-standard Jekyll site, with a couple of modifications.
+
+* I'm using a fork of mojombo/jekyll with changes from ascarter/jekyll merged in.
+  This gives me a timestamp for when a post was updated as well as when it was created.
+  (Though now that I think about it, what I think I'm getting from the ascarter changes
+  may really be coming from the original code. I should investigate.)
+* I have added two custom Liquid tags for generating and collating footnotes.
+  (Unfortunately, it appears that the Jekyll code used for Github Pages doesn't load
+  plugins for security reasons. I'm going to have to rethink this.)
+
+## About this blog
+
+&copy; 2010-2011 Craig S. Cottingham. All rights reserved.
