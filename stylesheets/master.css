@@ -42,6 +42,11 @@
     font-size: 0.7em;
 }
 
+.footnotes hr
+{
+    display: none;
+}
+
 .footnotes ol
 {
     border-top: 1px dotted rgb(136, 136, 136);

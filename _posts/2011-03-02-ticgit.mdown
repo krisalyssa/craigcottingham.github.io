@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "An Aside: TicGit"
-updated: 2011-03-05T17:37:00-06:00
+updated: 2011-03-05T18:06:00-06:00
 tags:
   - git
   - ticgit
@@ -43,9 +43,7 @@ the ticket's title and the rest is the initial comment. Tags can be entered on t
 
 We'll use this ticket as our starting point for behavior driven development.
 
-[^fn1]:
-    At least, it doesn't make sense to me. I come from an enterprise Java background,
-    and I'm still learning The Git Way.
+[^fn1]: At least, it doesn't make sense to me. I come from an enterprise Java background,
+        and I'm still learning The Git Way.
 
-[^fn2]:
-    Don't go there. Just... just don't.
+[^fn2]: Don't go there. Just... just don't.

@@ -4,11 +4,7 @@ This is my development blog, relating to projects stored in repositories at Gith
 It's also a place for me to document my learning process in new directions, and to
 record tips and tricks I don't otherwise want to forget.
 
-It's pretty much a bog-standard Jekyll site, with a few modifications:
-
-* Markdown processing is done by [kramdown](http://kramdown.rubyforge.org/);
-  I started using it for its footnote support, but I'll probably find other things about it
-  that I like.
+It's pretty much a bog-standard Jekyll site.
 
 ## About this blog
 

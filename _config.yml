@@ -7,5 +7,5 @@ safe: true
 source: .
 # my own overrides
 auto: true
-markdown: kramdown
+markdown: maruku
 permalink: /:year/:month/:day/:title.html
