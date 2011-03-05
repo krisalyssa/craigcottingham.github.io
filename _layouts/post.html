@@ -7,7 +7,7 @@ layout: default
   {{ content }}
   <ul class="metadata">
     <li><strong>posted:</strong> {{ page.date | date: "%Y-%m-%d" }}</li>
-    {% if page.updated != page.date %}
+    {% if page.updated %}
     <li><strong>updated:</strong> {{ page.updated | date: "%Y-%m-%d" }}</li>
     {% endif %}
     <li><strong>tags:</strong> {{ page.tags | join " " }}</li>
