@@ -1,5 +1,6 @@
 module Jekyll
   class AllFootnotesTag < Liquid::Tag
+    safe true
     
     def initialize(tag_name, markup, tokens)
       @ref = markup.strip
