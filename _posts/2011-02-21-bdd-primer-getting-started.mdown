@@ -2,12 +2,12 @@
 layout: post
 title: "Getting Started: A Behavior Driven Development Primer"
 tags:
-  - bdd
-  - cucumber
-  - rails
-  - rspec
-  - ruby
-  - testing
+- bdd
+- cucumber
+- rails
+- rspec
+- ruby
+- testing
 ---
 There are lots of perfectly useful tutorials on getting started with Rails, so I won't go into
 a lot of detail there. I assume that you already have Ruby and Rails installed; as of the time of

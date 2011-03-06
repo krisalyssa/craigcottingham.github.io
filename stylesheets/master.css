@@ -5,6 +5,13 @@
     margin: 0 auto;
 }
 
+.logo img
+{
+    position: absolute;
+    top: 16px;
+    left: -113px;
+}
+
 .column
 {
     margin: 0 165px;
@@ -57,7 +64,8 @@
     position: fixed;
     top: 0;
     z-index: 10;
-    height: 7em;
+/*    height: 7em;*/
+    height: 121px;
     width: 100%;
     margin-bottom: 0;
     background: rgb(237, 237, 237) none;
@@ -116,6 +124,7 @@
 
 .logo
 {
+    position: relative;
     padding-top: 22px;
     font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
     font-size: 3em;
@@ -153,7 +162,7 @@
     margin-left: 0px;
 }
 
-.posts ul
+.posts ul, .tags ul
 {
     position: relative;
     list-style: none;

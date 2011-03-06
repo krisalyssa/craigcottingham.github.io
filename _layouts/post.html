@@ -10,7 +10,9 @@ layout: default
     {% if page.updated %}
     <li><strong>updated:</strong> {{ page.updated | date: "%Y-%m-%d" }}</li>
     {% endif %}
-    <li><strong>tags:</strong> {{ page.tags | join " " }}</li>
+    {% if page.categories %}
+    <li><strong>tags:</strong> {{ page.categories | join " " }}</li>
+    {% endif %}
   </ul>
 </div>
 {% if !site.related_posts.empty? %}

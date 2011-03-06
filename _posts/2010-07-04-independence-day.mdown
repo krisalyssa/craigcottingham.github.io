@@ -1,9 +1,8 @@
 ---
 layout: post
 title: "Independence Day"
-tags:
-  - intro
-  - first
+categories:
+- administrivia
 ---
 I was all set for my first post to this blog to be a pastiche of the
 [Declaration of Independence](http://en.wikipedia.org/wiki/United_States_Declaration_of_Independence),

@@ -3,9 +3,9 @@ layout: post
 title: "An Aside: TicGit"
 updated: 2011-03-05T12:06:00-06:00
 tags:
-  - git
-  - ticgit
-  - ticket
+- git
+- ticgit
+- ticket
 ---
 [Larkware Shots](http://larkware.com/shots) recently mentioned
 [TicGit](https://github.com/jeffWelling/ticgit), a Git-based ticket system that keeps all of your
