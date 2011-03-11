@@ -1,7 +1,8 @@
 ---
 layout: post
 title: "Getting Started: A Behavior Driven Development Primer"
-tags:
+updated: 2011-03-06T18:39:00-06:00
+categories:
 - bdd
 - cucumber
 - rails

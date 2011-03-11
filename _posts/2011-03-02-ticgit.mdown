@@ -1,8 +1,8 @@
 ---
 layout: post
 title: "An Aside: TicGit"
-updated: 2011-03-05T12:06:00-06:00
-tags:
+updated: 2011-03-06T18:39:00-06:00
+categories:
 - git
 - ticgit
 - ticket
