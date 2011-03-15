@@ -13,6 +13,8 @@ layout: default
     {% if page.categories %}
     <li><strong>tags:</strong> {{ page.categories | join " " }}</li>
     {% endif %}
+    <li><strong>comment:</strong> <a href="mailto:craig.cottingham@gmail.com?subject=Re: {{ page.title | urlencode }} (craigcottingham.github.com)">via email</a>
+    </li>
   </ul>
 </div>
 {% if !site.related_posts.empty? %}
