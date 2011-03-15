@@ -59,16 +59,16 @@ the most recent version of MacRuby.
 You install MacRuby via RVM the same way you would any other Ruby:
 
 {% highlight sh %}
-    $ rvm install macruby
+  $ rvm install macruby
 {% endhighlight %}
 
 RVM downloads MacRuby, runs its installer, then perform its usual magic to make which
 version of Ruby you're running transparent. In other words, MacRuby *is* your Ruby:
 
 {% highlight sh %}
-    $ rvm use macruby
-    $ ruby -v
-    MacRuby 0.9 (ruby 1.9.2) [universal-darwin10.0, x86_64]
+  $ rvm use macruby
+  $ ruby -v
+  MacRuby 0.9 (ruby 1.9.2) [universal-darwin10.0, x86_64]
 {% endhighlight %}
 
 Okay, so MacRuby is your Ruby. But what about the Cocoa part?

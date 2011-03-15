@@ -23,7 +23,7 @@ All of TicGit's functions are accessed through the `ti` command, similar to Git 
 To create a ticket:
 
 {% highlight sh %}
-    $ ti new
+  $ ti new
 {% endhighlight %}
 
 As with Git, if you don't specify a message on the command line, you're thrown into your
@@ -31,14 +31,14 @@ editor (in my case, Vim[^fn2]). Of whatever text you enter, the first line is ta
 the ticket's title and the rest is the initial comment. Tags can be entered on the `tags:` line.
 
 {% highlight sh %}
-    User can enter a new book
-    When the user goes to the new book page, enters a name and description, and
-    presses "Create", she should be returned to the list page and see the book
-    she just entered.
-    # ---
-    tags: story
-    # first line will be the title of the tic, the rest will be the first comment
-    # if you would like to add initial tags, put them on the 'tags:' line, comma delim
+  User can enter a new book
+  When the user goes to the new book page, enters a name and description, and
+  presses "Create", she should be returned to the list page and see the book
+  she just entered.
+  # ---
+  tags: story
+  # first line will be the title of the tic, the rest will be the first comment
+  # if you would like to add initial tags, put them on the 'tags:' line, comma delim
 {% endhighlight %}
 
 We'll use this ticket as our starting point for behavior driven development.
