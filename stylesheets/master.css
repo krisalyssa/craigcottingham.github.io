@@ -64,7 +64,6 @@
     position: fixed;
     top: 0;
     z-index: 10;
-/*    height: 7em;*/
     height: 121px;
     width: 100%;
     margin-bottom: 0;
@@ -237,6 +236,15 @@ body
 body *
 {
     line-height: 1.2em;
+}
+
+blockquote
+{
+    margin: 0 2em;
+    font-style: italic;
+    background-image: url(../images/blockquote.png);
+    background-repeat: no-repeat;
+    background-position: top left;
 }
 
 code
