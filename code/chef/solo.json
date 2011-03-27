@@ -3,31 +3,22 @@
     "recipe[build-essential]",
     "recipe[git]",
     "recipe[users]",
-    "recipe[sudo]",
-    "recipe[gems]"
+    "recipe[sudo]"
   ],
   "users": {
     "craigc": {
+      "id": "craigc",
       "password": "$1$6MWkRQsu$l/lRSPpiTnwUt8eHX.jlQ.",
-      "comment": "Craig S. Cottingham <craig.cottingham@gmail.com>"
+      "uid": 2001,
+      "comment": "Craig S. Cottingham <craig.cottingham@gmail.com>",
+      "shell": "\/bin\/bash",
+      "groups": "sysadmin",
+      "ssh_keys": "ssh-dss AAAAB3NzaC1kc3MAAACBAIE6HeURWfLDt1k+fIikyO3GjN8laDuEFvdIAbgBMDnZQYnTlUewdkXOqiQxPraPwJr67nosoyFSmZ7jc29rmJHF8iPkZo+xpJ8pIYIb342C6S8o9wdQWSP96hp0rEhVPRpmRcb8MkrEVfuMlVQ4WrKYCFc6VwNKQyBR+9qw7ZDHAAAAFQCYbqCXhOZJY8qrWaeI0ZzkzpZY7QAAAIAEDIlx3y8chn+khNzKdHJRFXVFhu1Mns9PtVUAVcxBNwBe4iMcXXG8KwzUiKMd8qd4C54yCVrQLy0O1wv2cQ7xgZrPy9mz3Epr0RCsoSdxXXi9nbRmg9MhQzR2Jc5PvWPcVenW43jHXQaK6obdqL6hu9o6jQixMa+FXIw+ItVBHwAAAIBqp0dbpsWBr/lYHyzDsAZSsQakQILsJrHxwBHODSpck1qaEzdWiiRMmvgGFGllz02Pt6RI+OSW8aXUxmk/gPjdy0V3jh35mCbSo/xaODiJlfRhog28abE68Eq5mNY5d8MjeGL8xm/ZDMrZL3Wd8UIs3pTJ2dsiyxPMFlaelwUw6A== craigc@localhost"
     }
-  },
-  "ssh_keys": {
-    "craigc": "ssh-dss AAAAB3NzaC1kc3MAAACBAIE6HeURWfLDt1k+fIikyO3GjN8laDuEFvdIAbgBMDnZQYnTlUewdkXOqiQxPraPwJr67nosoyFSmZ7jc29rmJHF8iPkZo+xpJ8pIYIb342C6S8o9wdQWSP96hp0rEhVPRpmRcb8MkrEVfuMlVQ4WrKYCFc6VwNKQyBR+9qw7ZDHAAAAFQCYbqCXhOZJY8qrWaeI0ZzkzpZY7QAAAIAEDIlx3y8chn+khNzKdHJRFXVFhu1Mns9PtVUAVcxBNwBe4iMcXXG8KwzUiKMd8qd4C54yCVrQLy0O1wv2cQ7xgZrPy9mz3Epr0RCsoSdxXXi9nbRmg9MhQzR2Jc5PvWPcVenW43jHXQaK6obdqL6hu9o6jQixMa+FXIw+ItVBHwAAAIBqp0dbpsWBr/lYHyzDsAZSsQakQILsJrHxwBHODSpck1qaEzdWiiRMmvgGFGllz02Pt6RI+OSW8aXUxmk/gPjdy0V3jh35mCbSo/xaODiJlfRhog28abE68Eq5mNY5d8MjeGL8xm/ZDMrZL3Wd8UIs3pTJ2dsiyxPMFlaelwUw6A== craigc@localhost"
   },
   "authorization": {
     "sudo": {
-      "users": ["craigc"]
+      "groups": ["sysadmin"]
     }
-  },
-  "gems": [
-    { "name": "rake" },
-    { "name": "rails" },
-    { "name": "bundler" },
-    { "name": "rack" },
-    { "name": "rack-cache" },
-    { "name": "cucumber" },
-    { "name": "rspec" },
-    { "name": "rspec-rails" }
-  ]
+  }
 }
