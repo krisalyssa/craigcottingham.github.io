@@ -17,7 +17,7 @@
       "uid": 2001,
       "group": "sudoers",
       "ssh": true,
-      "sudo": true,
+      "sudo": true
     }
   }
 }

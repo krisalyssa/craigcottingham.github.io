@@ -5,7 +5,7 @@ yum -y upgrade
 yum -y install gcc ruby ruby-devel ruby-libs rubygems
 
 # update RubyGems
-gem update --system
+gem update --system 1.6.2
 
 # install Chef
 gem install chef ohai
