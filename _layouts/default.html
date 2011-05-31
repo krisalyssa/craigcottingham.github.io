@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     {% if page.title != '' %}
@@ -12,6 +12,9 @@
     <link rel="alternate" href="/atom.xml" type="application/atom+xml" title="RSS feed for craigcottingham.github.com" />
     <script type="text/javascript" src="http://use.typekit.com/dvb2nak.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    <script type="text/javascript" src="/scripts/Hyphenator.js"></script>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.js"></script>
+    <script type="text/javascript">
   </head>
   <body>
     <div id="main">
@@ -37,7 +40,7 @@
         </div>
       </div>
       <div class="content">
-        <div class="column">
+        <div class="column hyphenate" id="main-content">
           {{ content }}
         </div>
       </div>
