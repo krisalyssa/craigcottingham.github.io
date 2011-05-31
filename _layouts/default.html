@@ -15,6 +15,38 @@
     <script type="text/javascript" src="/scripts/Hyphenator.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.6.1.js"></script>
     <script type="text/javascript">
+var setTextMeasure = function (contentElement, targetMeasure, maxSize, minSize) {
+
+  if (!contentElement) contentElement = $(document.createElement('p'));
+  if (!targetMeasure) targetMeasure = 66;
+  if (!maxSize) maxSize = 16;
+  if (!minSize) minSize = 9;
+
+  var body = $('body');
+  var sizer = contentElement.clone();
+
+  sizer.css({'margin': 0, 'padding': 0, 'color': 'transparent', 'backgroundColor': 'transparent', 'position': 'absolute'});
+
+  var letters = 'aaaaaaaabbcccddddeeeeeeeeeeeeeffgghhhhhhiiiiiiijkllllmmnnnnnnnooooooooppqrrrrrrsssssstttttttttuuuvwxyyz';
+  sizer.text(letters);
+
+  body.append(sizer);
+  var characterWidth = sizer.width() / letters.length;
+  sizer.remove();
+
+  var contentWidth = contentElement.width();
+
+  var measuredFontSize = parseFloat( body.css('font-size').replace('px', '') );
+
+  var actualMeasure = contentWidth / characterWidth;
+  var newMeasure = measuredFontSize * actualMeasure / targetMeasure;
+
+  if (newMeasure > maxSize) newMeasure = maxSize;
+  if (newMeasure < minSize) newMeasure = minSize;
+
+  body.css('font-size', newMeasure + "px");
+}
+    </script>
   </head>
   <body>
     <div id="main">
@@ -59,4 +91,10 @@
       </div>
     </div>
   </body>
+  <script type="text/javascript">
+$(document).ready(function() {
+  setTextMeasure($("#main-content"));
+  Hyphenator.run();
+});
+  </script>
 </html>
