@@ -144,6 +144,15 @@
     list-style: none;
 }
 
+.plusone
+{
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    right: 70px;
+    margin-top: 0.4em;
+}
+
 .post
 {
     position: relative;
