@@ -34,7 +34,7 @@ There are three pieces to a Chef Solo implementation, besides Chef itself.
 2. A tarball containing the recipes and roles to use; for the purposes of this document, I'll be
    calling it `cookbooks.tar.gz`.
 3. A JSON fragment containing the attributes configuring the node; for the purposes of this document,
-   I'll be calling it `solo.json`.
+   I'll be calling it `mynode.json`.
 
 ### First course: `config.rb`
 
@@ -95,7 +95,7 @@ To allow you to play along at home, I've put a sample tarball at
 <https://s3.amazonaws.com/craigcottingham-blog/chef/cookbooks.tar.gz>. Don't rely on the contents for
 your own uses, as they are subject to change without notice. [^fn4]
 
-### Third course: `solo.json`
+### Third course: `mynode.json`
 
 The first two parts of Chef Solo can be common to all nodes configured by Chef, and in fact that's how
 I use it. The third part is where you give attributes specific to a single node.
