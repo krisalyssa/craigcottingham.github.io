@@ -1,0 +1,31 @@
+{
+  "run_list": [
+    "recipe[build-essential]",
+    "recipe[hostname]",
+    "recipe[hosts]",
+    "recipe[timezone]",
+    "recipe[networking_basic]",
+    "recipe[rvm]",
+    "recipe[git]",
+    "recipe[postfix]"
+  ],
+
+  "fqdn": "mynode.example.com",
+  "servername": "mynode",
+  "domain": "example.com",
+  "ip_address": "127.0.0.1",
+  "timezone": "US/Central",
+
+  "postfix": {
+    "mail_type": "default"
+  },
+
+  "rvm": {
+    "version": "head",
+    "track_updates": true,
+    "ruby": {
+      "version": "1.9.2",
+      "default": true
+    }
+  }
+}
