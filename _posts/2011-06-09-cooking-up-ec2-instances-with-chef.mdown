@@ -158,7 +158,7 @@ reachable by a freshly-started EC2 instance; Amazon S3 is as good a place as any
 
 Second, create a shell script something like the following and save it locally. You can upload it to
 the same place as the other files for safekeeping, but it needs to be readable _as a file_ by the
-`ec2run` command.
+`ec2run` command. (If you want, you can [download](/code/chef/mynode.sh) it from this web site.)
 
 {% highlight sh %}
   #!/bin/sh
