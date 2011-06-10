@@ -1,4 +1,4 @@
-  ---
+---
 layout: post
 title: "Cooking up EC2 Instances with Chef"
 categories:
@@ -36,7 +36,9 @@ There are three pieces to a Chef Solo implementation, besides Chef itself.
 3. A JSON fragment containing the attributes configuring the node; for the purposes of this document,
    I'll be calling it `mynode.json`.
 
-### First course: `config.rb`
+Examples of each of these three are presented below, and can also be downloaded from this web site.
+
+### First course: `config.rb` [(download)](/code/chef/config.rb)
 
 The configuration file specifies where Chef Solo puts its working files, and other runtime options like
 logging. Chef provides a DSL, which simplifies the syntax. There are two required attributes:
@@ -62,7 +64,7 @@ However, note that not all of those attributes are used by Chef Solo.
   verbose_logging  true
 {% endhighlight %}
 
-### Second course: `cookbooks.tar.gz`
+### Second course: `cookbooks.tar.gz` [(download)](/code/chef/cookbooks.tar.gz)
 
 The cookbooks tarball contains the recipes [^fn3] that Chef Solo will reference when running.
 This is something that you have to build yourself; think of it as your personal playlist of
@@ -91,11 +93,7 @@ Cookbooks can be found in a number of places.
   are forks of the `cookbooks` repositories with topic branches, but there's some new stuff in there
   as well.
 
-To allow you to play along at home, I've put a sample tarball at
-<https://s3.amazonaws.com/craigcottingham-blog/chef/cookbooks.tar.gz>. Don't rely on the contents for
-your own uses, as they are subject to change without notice. [^fn4]
-
-### Third course: `mynode.json`
+### Third course: `mynode.json` [(download)](/code/chef/mynode.json)
 
 The first two parts of Chef Solo can be common to all nodes configured by Chef, and in fact that's how
 I use it. The third part is where you give attributes specific to a single node.
@@ -104,7 +102,7 @@ The good news is that it's a JSON fragment, so it's a standard data format which
 be familiar with. The bad news is that it's a JSON fragment, which means that's it's extremely sensitive
 to bad syntax (like dangling commas) and you aren't allowed to comment in-line.
 
-The most important part of the JSON fragment is the `run_list` value. This tells Chef Solo what recipes [^fn5]
+The most important part of the JSON fragment is the `run_list` value. This tells Chef Solo what recipes [^fn4]
 to use to configure the node. The remainder of the JSON fragment supplies data used by the recipes.
 Obviously, the data supplied depends on the recipes; you'll need to check the documentation.
 
@@ -221,6 +219,4 @@ in the right direction for jumping headlong in to Chef.
 
 [^fn3]: And roles, which I'll talk about in a future post.
 
-[^fn4]: Not to mention that if my Amazon S3 bandwidth charge goes sky-high, I'll be forced to take it down.
-
-[^fn5]: See footnote 3.
+[^fn4]: See footnote 3.
