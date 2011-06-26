@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     {% if page.title != '' %}
@@ -10,9 +10,44 @@
     <link rel="stylesheet" href="/stylesheets/master.css" type="text/css" media="screen" />
     <link rel="stylesheet" href="/stylesheets/syntax.css" type="text/css" />
     <link rel="alternate" href="/atom.xml" type="application/atom+xml" title="RSS feed for craigcottingham.github.com" />
-    <script src="http://www.google.com/jsapi" type="text/javascript" />
     <script type="text/javascript" src="http://use.typekit.com/dvb2nak.js"></script>
     <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+    <script type="text/javascript" src="/scripts/Hyphenator.js"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+    <script type="text/javascript">
+var setTextMeasure = function (contentElement, targetMeasure, maxSize, minSize) {
+
+  if (!contentElement) contentElement = $(document.createElement('p'));
+  if (!targetMeasure) targetMeasure = 66;
+  if (!maxSize) maxSize = 16;
+  if (!minSize) minSize = 9;
+
+  var body = $('body');
+  var sizer = contentElement.clone();
+
+  sizer.css({'margin': 0, 'padding': 0, 'color': 'transparent', 'backgroundColor': 'transparent', 'position': 'absolute'});
+
+  var letters = 'aaaaaaaabbcccddddeeeeeeeeeeeeeffgghhhhhhiiiiiiijkllllmmnnnnnnnooooooooppqrrrrrrsssssstttttttttuuuvwxyyz';
+  sizer.text(letters);
+
+  body.append(sizer);
+  var characterWidth = sizer.width() / letters.length;
+  sizer.remove();
+
+  var contentWidth = contentElement.width();
+
+  var measuredFontSize = parseFloat( body.css('font-size').replace('px', '') );
+
+  var actualMeasure = contentWidth / characterWidth;
+  var newMeasure = measuredFontSize * actualMeasure / targetMeasure;
+
+  if (newMeasure > maxSize) newMeasure = maxSize;
+  if (newMeasure < minSize) newMeasure = minSize;
+
+  body.css('font-size', newMeasure + "px");
+}
+    </script>
+    <script type="text/javascript" src="http://apis.google.com/js/plusone.js"></script>
   </head>
   <body>
     <div id="main">
@@ -28,6 +63,7 @@
             <ul>
               <li><a href="/">home</a></li>
               <li><a href="http://github.com/CraigCottingham/">github</a></li>
+              <li><a href="/metrics.html">metrics</a></li>
               <li><a href="http://twitter.com/CraigCottingham">twitter</a></li>
               <li><a href="mailto:craig.cottingham@gmail.com">email</a></li>
               <li><a href="/tags.html">tags</a></li>
@@ -37,7 +73,7 @@
         </div>
       </div>
       <div class="content">
-        <div class="column">
+        <div class="column hyphenate" id="main-content">
           {{ content }}
         </div>
       </div>
@@ -51,9 +87,16 @@
               Hosted at <a href="http://github.com/">Github</a>.
               Powered by <a href="https://github.com/mojombo/jekyll/">Jekyll</a>.
             </div>
+            <div class="plusone"><g:plusone size="medium" count="false"></g:plusone></div>
           </div>
         </div>
       </div>
     </div>
   </body>
+  <script type="text/javascript">
+$(document).ready(function() {
+  setTextMeasure($("#main-content"));
+  Hyphenator.run();
+});
+  </script>
 </html>
