@@ -25,6 +25,17 @@
     padding-bottom: 3em;
 }
 
+.ed-note
+{
+    font-style: italic;
+    margin: 0.8em 2em 0 1em;
+    padding: 0.5em;
+    border: 1px black solid;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+}
+
 .fineprint
 {
     font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
