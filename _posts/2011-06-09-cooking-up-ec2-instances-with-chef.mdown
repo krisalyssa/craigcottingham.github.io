@@ -7,6 +7,8 @@ categories:
 - ec2
 - linux
 ---
+<div class="ed-note">Updated 2011-06-26: Fixed the description of the internal layout of `cookbooks.tar.gz`.</div>
+
 In [my last blog post about EC2](/2011/03/21/ec2-and-cloudinit.html), I closed by mentioning that
 CloudInit has a 16K limit on user data, into which it can be difficult to shoehorn complex server
 configurations. One way around that is a configuration management tool; I'll look at one called
@@ -72,7 +74,7 @@ cookbooks selected from all the cookbooks out there. At a minimum, the tarball s
 internal layout something like:
 
 {% highlight sh %}
-  recipes/
+  cookbooks/
     build-essential/
       ...
     git
@@ -80,8 +82,11 @@ internal layout something like:
     rvm
       ...
 {% endhighlight %}
-      
-Cookbooks can be found in a number of places.
+
+If you include roles, they should be in a directory named `roles` at the top level, as a sibling of
+`cookbooks`.
+
+Premade cookbooks can be found in a number of places.
 
 * The canonical source is <http://community.opscode.com/cookbooks>. Unfortunately, the documentation
   for each cookbook is thin at best; often, you need to download the cookbook and read the contents
