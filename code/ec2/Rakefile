@@ -1,0 +1,139 @@
+require 'bundler/setup'
+
+require 'json'
+require 'rake'
+require 'right_aws'
+require 'yaml'
+
+## monkey patch Array to ease converting security group names to IDs
+class Array
+  def to_sg
+    self.collect { | sym | security_groups[sym] }
+  end
+end
+
+def security_groups
+  {
+    :default => 'sg-XXXXXXXX',
+  }
+end
+
+def nodes
+  {
+    :mynode => {
+      :ami => 'ami-8c1fece5',
+      :groups => [ :default ],
+      :public_ip => 'XXX.XXX.XXX.XXX',
+      :size => 't1.micro',
+      :json => {
+        :run_list => [
+          "recipe[build-essential]",
+          "recipe[hostname]",
+          "recipe[hosts]",
+          "recipe[timezone]",
+          "recipe[networking_basic]",
+        ],
+
+        :fqdn => "mynode.example.com",
+        :servername => "mynode",
+        :domain => "example.com",
+        :ip_address => "XXX.XXX.XXX.XXX",
+        :timezone => "US/Eastern",
+      }
+    },
+  }
+end
+
+task :cookbooks do
+  chdir("cookbooks") do
+    sh %{tar zcvf ../cookbooks.tar.gz --exclude '.*' *}
+  end
+end
+
+task :nodes do
+  nodes.each do | key, value |
+    if value.has_key? :json
+      File.open("nodes/#{key.to_s}/solo.json", "w") do | file |
+        file.puts value[:json].to_json
+      end
+    end
+  end
+end
+
+task :upload => [ :load_credentials, :cookbooks, :nodes ] do
+  throw "credentials not loaded" if (@credentials.nil? or @credentials['access_key'].nil?)
+  s3 = RightAws::S3.new(@credentials['access_key'], @credentials['secret_key'])
+  
+  bucket = s3.bucket('XXXXXXXX-cloudinit')
+  bucket = s3.bucket('XXXXXXXX-cloudinit', true) if bucket.nil?
+
+  # upload cookbooks
+  bucket.put('cookbooks.tar.gz', File.open('cookbooks.tar.gz'))
+  
+  # upload code
+  Dir.foreach("code") do | f |
+    if (f !~ /^\./)
+      bucket.put(f, File.open(File.join("code", f)))
+    end
+  end
+  
+  # upload nodes
+  Dir.foreach("nodes") do | d |
+    if (File.directory? File.join("nodes", d)) and (d !~ /^\./)
+      Dir.foreach(File.join("nodes", d)) do | f |
+        if (f !~ /^\./)
+          # puts File.join(d, f)
+          bucket.put(File.join(d, f), File.open(File.join("nodes", d, f)))
+        end
+      end
+    end
+  end
+end
+
+def run_node(node_id)
+  ec2 = RightAws::Ec2.new(@credentials['access_key'], @credentials['secret_key'])
+  node = nodes[node_id]
+  
+  # launch instance
+  # instances = ec2.run_instances(node[:ami], 1, 1, node[:groups], ENV['EC2_KEYPAIR_NAME'],
+  #                               File.open("nodes/#{node_id.to_s}/solo.sh"), nil, node[:size])
+  instances = ec2.launch_instances(node[:ami], :group_ids => node[:groups].to_sg,
+                                   :key_name => ENV['EC2_KEYPAIR_NAME'],
+                                   :user_data => File.open("nodes/#{node_id.to_s}/solo.sh"),
+                                   :instance_type => node[:size],
+                                   :block_device_mappings => node[:block_device_mappings],
+                                   :subnet_id => node[:subnet_id], :private_ip_address => node[:private_ip])
+  instance = instances[0]
+  instance_id = instance[:aws_instance_id]
+  
+  # wait until instance is in "running" state
+  loop do
+    sleep(5)
+    instances = ec2.describe_instances(instance_id, :filters => { 'instance-state-name' => 'running' })
+    break unless (instances.nil? || (instances.count < 1))
+    puts "waiting..."
+  end
+  instance = instances[0]
+  
+  # name the instance
+  ec2.create_tags(instance_id, { "Name" => node_id.to_s })
+  
+  # associate IP address with instance
+  unless node[:public_ip].nil?
+    if node[:subnet_id].nil?
+      ec2.associate_address(instance_id, node[:public_ip])
+    else
+      # associate public IP address with a VPC instance
+    end
+  end
+  
+  puts instance[:ip_address]
+end
+
+task :run_mynode => :load_credentials do
+  run_node(:mynode)
+end
+
+task :load_credentials do
+  @credentials = YAML.load_file(File.expand_path("~/.ec2/XXXXXXXX-access.yaml"))
+end
