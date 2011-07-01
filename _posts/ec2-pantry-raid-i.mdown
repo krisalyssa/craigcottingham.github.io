@@ -12,7 +12,8 @@ decided to lump them all together here.
 
 ## Homebrew
 
-(install EC2 API command line tools via Homebrew)
+If you're running on Mac OS X, you can install the EC2 API command-line tools via
+[Homebrew](http://mxcl.github.com/homebrew/):
 
 {% highlight sh %}
   $ brew install ec2-api-tools
