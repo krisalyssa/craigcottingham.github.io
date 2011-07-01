@@ -85,25 +85,3 @@ Note that both the external IP address and the external name changed, to
 
 When the EC2 instance is stopped or terminated, the IP address is disassociated,
 and you can associate it with a different EC2 instance (or the same one, if you restart it).
-
-## Tags
-
-ec2-create-tags
-ec2-delete-tags
-ec2-describe-tags
-
-## Monitoring
-
-ec2-monitor-instances
-ec2-unmonitor-instances
-
-## Snapshots
-
-ec2-create-snapshot
-ec2-describe-snapshots
-ec2-delete-snapshot
-ec2-create-volume
-
-## Console output
-
-ec2-get-console-output
