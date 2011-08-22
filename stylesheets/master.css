@@ -217,6 +217,15 @@ li div.post-date
     text-align: center;
 }
 
+.tweetthis
+{
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    right: 110px;
+    margin-top: 0.4em;
+}
+
 .black
 {
     color: rgb(0, 0, 0);
