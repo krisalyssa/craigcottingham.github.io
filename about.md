@@ -10,7 +10,7 @@ rearrange characters on this glowing rectangle on my desk.
 
 # About this blog
 
-&copy; 2010-2011 Craig S. Cottingham. All rights reserved.
+&copy; 2010-2012 Craig S. Cottingham. All rights reserved.
 
 Hosted at [Github](http://github.com/).
 
@@ -19,8 +19,8 @@ Powered by [Jekyll](https://github.com/mojombo/jekyll/).
 Makes liberal use of [Markdown](http://daringfireball.net/projects/markdown/)
 by John Gruber.
 
-Tools include [TextMate](http://macromates.com/) and Safari. The rest is command-line stuff,
-though I've been giving [Tower](http://www.git-tower.com/) a whirl lately.
+Tools include [TextMate](http://macromates.com/),
+[Tower](http://www.git-tower.com/), and Safari.
 
 Typographical support from [Typekit](http://typekit.com/). Fonts they're serving up for me include
 [Ligurino Condensed](http://typekit.com/fonts/ligurino-condensed) by [Typodermic](http://typodermicfonts.com/) and
