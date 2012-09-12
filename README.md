@@ -8,4 +8,4 @@ It's pretty much a bog-standard Jekyll site.
 
 ## About this blog
 
-&copy; 2010-2011 Craig S. Cottingham. All rights reserved.
+&copy; 2010-2012 Craig S. Cottingham. All rights reserved.
