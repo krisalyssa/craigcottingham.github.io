@@ -77,11 +77,11 @@ Log in as `ec2-user`.
   RSA key fingerprint is 0d:e2:46:64:b2:97:5c:48:1a:30:56:f2:9e:ca:b1:91.
   Are you sure you want to continue connecting (yes/no)? yes
   Warning: Permanently added '50.17.77.114' (RSA) to the list of known hosts.
-
+   
          __|  __|_  )  Amazon Linux AMI
          _|  (     /     Beta
         ___|\___|___|
-
+   
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
   [ec2-user@domU-12-31-39-00-DD-83 ~]$
 {% endhighlight %}
@@ -110,7 +110,7 @@ we allocated.
   old desc_blocks = 1, new_desc_blocks = 1
   Performing an on-line resize of /dev/sda1 to 4194304 (4k) blocks.
   The filesystem on /dev/sda1 is now 4194304 blocks long.
-
+   
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ df
   Filesystem           1K-blocks      Used Available Use% Mounted on
   /dev/xvda1            16513960    897836  15448528   6% /
@@ -135,7 +135,7 @@ the instance should stop rather than terminate, when we launched it).
 
 {% highlight sh %}
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ sudo shutdown -h now
-
+   
   The system is going down for system halt NOW!DD-83 (pts/0) (Wed Mar 16 15:53:
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ Connection to 50.17.77.114 closed by remote host.
   Connection to 50.17.77.114 closed.
@@ -177,11 +177,11 @@ Log in, and go looking for the file that was stashed in `ec2-user`'s home direct
   Are you sure you want to continue connecting (yes/no)? yes
   Warning: Permanently added '50.16.85.142' (RSA) to the list of known hosts.
   Last login: Wed Mar 16 15:36:00 2011 from NNN-NNN-NNN-NNN.lightspeed.mssnks.sbcglobal.net
-
+   
          __|  __|_  )  Amazon Linux AMI
          _|  (     /     Beta
         ___|\___|___|
-
+   
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
   [ec2-user@domU-12-31-39-09-48-D5 ~]$ ls -l
   total 4
@@ -207,19 +207,19 @@ in the filesystem.
 {% highlight sh %}
   $ ec2-describe-volumes
   VOLUME  vol-006f4868  16  snap-cba692a1 us-east-1b  available 2011-03-17T01:53:49+0000
-
+   
   $ ec2-attach-volume vol-006f4868 -i i-b2719add -d /dev/sda2
   ATTACHMENT  vol-006f4868  i-b2719add  /dev/sda2 attaching 2011-03-17T02:55:11+0000
-
+   
   $ ssh -i $EC2_KEYPAIR ec2-user@50.16.85.142
   Last login: Thu Mar 17 02:58:49 2011 from NNN-NNN-NNN-NNN.lightspeed.mssnks.sbcglobal.net
-
+   
          __|  __|_  )  Amazon Linux AMI
          _|  (     /     Beta
         ___|\___|___|
-
+   
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
-
+   
   [ec2-user@ip-10-196-37-162 ~]$ mkdir mnt
   [ec2-user@ip-10-196-37-162 ~]$ sudo mount /dev/sdb1 mnt
   [ec2-user@ip-10-196-37-162 ~]$ ls -l mnt/home/ec2-user/

@@ -101,11 +101,11 @@ opened up the SSH port, we can log in as this user:
   RSA key fingerprint is dc:35:e8:86:fd:9f:63:2f:6a:cc:bc:d6:1d:6b:32:ee.
   Are you sure you want to continue connecting (yes/no)? yes
   Warning: Permanently added '50.17.139.123' (RSA) to the list of known hosts.
-
+   
          __|  __|_  )  Amazon Linux AMI
          _|  (     /     Beta
         ___|\___|___|
-
+   
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
   [ec2-user@ip-10-244-15-197 ~]$
 {% endhighlight %}
@@ -117,7 +117,7 @@ You can do all the things you'd expect to be able to do on a Linux system:
   [ec2-user@ip-10-244-15-197 ~]$ yum check-update
   Loaded plugins: fastestmirror, security
   Skipping security plugin, no data
-
+   
   aws-amitools-ec2.noarch             1.3.57676-1.1.amzn1                     amzn
   aws-apitools-as.noarch              1.0.33.1-1.1.amzn1                      amzn
   aws-apitools-ec2.noarch             1.3.62308-1.1.amzn1                     amzn
