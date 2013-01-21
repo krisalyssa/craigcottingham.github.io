@@ -60,8 +60,34 @@ Add these variables to your environment, and make sure they're loaded into your 
 You have to have an AWS account, and have signed up for EC2.
 
 Go to <http://aws.amazon.com/account/> and click on the link that reads "Security Credentials".
-Log into your AWS account when prompted. Scroll down to "Access Credentials", and click on the
-tab that reads "X.509 Certificates".
+Log into your AWS account when prompted. Scroll down to "Access Credentials".
+
+#### Access Keys
+
+The command line tools access AWS through a web service, which requires access keys.
+
+Click on the tab that reads "Access Keys", then on "Create a new Access Key". After a moment,
+you should see a new entry under "Your Access Keys".
+
+<div markdown="1" class="screenshot">
+![Screenshot of AWS Access Credentials, Access Key][aws_access_key]
+</div>
+
+Copy the string under "Access Key ID" and save it to a file in the directory pointed to by
+the `EC2_PRIVATE_HOME` environment variable (for instance, `aws-access-key`).
+
+You'll also need to save the secret access key, so click on "Show" next to the access key ID.
+
+<div markdown="1" class="screenshot">
+![Screenshot of AWS Access Credentials, Secret Access Key][aws_secret_access_key]
+</div>
+
+Copy this string and save it to a different file in `EC2_PRIVATE_HOME` (for instance,
+`aws-secret-access-key`).
+
+#### X.509 Certificates
+
+Next, click on the tab that reads "X.509 Certificates".
 
 <div markdown="1" class="screenshot">
 ![Screenshot of AWS Access Credentials, X.509 Certificates][aws_credentials_x509]
@@ -69,7 +95,7 @@ tab that reads "X.509 Certificates".
 
 Click on "Create a new Certificate". After a moment, you'll get a dialog box containing buttons
 with which you can download your newly-created private key and certificate. Click on each
-button in turn, and download the files to the directory named `~/.ec2`.
+button in turn, and download the files to the directory named `EC2_PRIVATE_HOME`.
 
 <div markdown="1" class="screenshot">
 ![Screenshot of AWS X.509 Certificate download][aws_x509_created]
@@ -82,7 +108,7 @@ create a new one.
 Finally, create an SSH keypair like so:
 
 {% highlight sh %}
-  $ ec2-add-keypair ec2-keypair > $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
+  $ ec2-add-keypair ec2-keypair -O `cat $EC2_PRIVATE_HOME/aws-access-key` -W `cat $EC2_PRIVATE_HOME/aws-secret-access-key` > $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
   $ chmod 600 $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
 {% endhighlight %}
 
@@ -106,6 +132,10 @@ correctly.
         [Rackspace Cloud](http://www.rackspace.com/cloud/), at least not yet.
         EC2 is just what I'm working with at the moment.
 
-[aws_credentials_x509]: /images/aws_credentials_x509.png
+[aws_access_key]: http://f.cl.ly/items/2r0W081D0y472B0c0i3x/aws_access_key.png
 
-[aws_x509_created]: /images/aws_x509_created.png
+[aws_secret_access_key]: http://f.cl.ly/items/2L0D1G2I051A0g030d1J/aws_secret_access_key.png
+
+[aws_credentials_x509]: http://f.cl.ly/items/11461t2M0f1f0l0S3d2f/aws_credentials_x509.png
+
+[aws_x509_created]: http://f.cl.ly/items/38470P1K44432W0M1l1R/aws_x509_created.png

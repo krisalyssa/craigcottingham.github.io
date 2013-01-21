@@ -20,7 +20,7 @@ for EBS-backed instances.
 {% highlight sh %}
   $ ec2-run-instances --group default --key ec2-keypair \
     --block-device-mapping "/dev/sda1=:16:false" --instance-initiated-shutdown-behavior stop \
-    --disable-api-termination ami-76f0061f
+    --disable-api-termination ami-1624987f
 {% endhighlight %}
 
 About the parameters and their values:
@@ -45,8 +45,8 @@ Make sure that the instance is running.
                 domU-12-31-39-00-DD-83.compute-1.internal       running hrworx-keypair  0 \
                 m1.small  2011-03-16T15:22:45+0000  us-east-1a  aki-407d9529              \
                 monitoring-disabled     50.17.77.114    10.254.226.113  ebs   paravirtual \
-                xen	
-  BLOCKDEVICE   /dev/sda1       vol-5a745032    2011-03-16T15:23:06.000Z	
+                xen
+  BLOCKDEVICE   /dev/sda1       vol-5a745032    2011-03-16T15:23:06.000Z
   $ ping 50.17.77.114
   PING 50.17.77.114 (50.17.77.114): 56 data bytes
   64 bytes from 50.17.77.114: icmp_seq=0 ttl=44 time=81.047 ms
@@ -83,7 +83,7 @@ Log in as `ec2-user`.
         ___|\___|___|
 
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
-  [ec2-user@domU-12-31-39-00-DD-83 ~]$ 
+  [ec2-user@domU-12-31-39-00-DD-83 ~]$
 {% endhighlight %}
 
 Let's have a look at the EBS volume that's being used for root.
@@ -110,7 +110,7 @@ we allocated.
   old desc_blocks = 1, new_desc_blocks = 1
   Performing an on-line resize of /dev/sda1 to 4194304 (4k) blocks.
   The filesystem on /dev/sda1 is now 4194304 blocks long.
-   
+
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ df
   Filesystem           1K-blocks      Used Available Use% Mounted on
   /dev/xvda1            16513960    897836  15448528   6% /
@@ -126,7 +126,7 @@ and restarted. Copy some text to a file in the `ec2-user`'s home directory. [^fn
 
 {% highlight sh %}
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ echo 'Woot!' > persistent.txt
-  [ec2-user@domU-12-31-39-00-DD-83 ~]$ cat persistent.txt 
+  [ec2-user@domU-12-31-39-00-DD-83 ~]$ cat persistent.txt
   Woot!
 {% endhighlight %}
 
@@ -135,7 +135,7 @@ the instance should stop rather than terminate, when we launched it).
 
 {% highlight sh %}
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ sudo shutdown -h now
-   
+
   The system is going down for system halt NOW!DD-83 (pts/0) (Wed Mar 16 15:53:
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ Connection to 50.17.77.114 closed by remote host.
   Connection to 50.17.77.114 closed.
@@ -148,8 +148,8 @@ Check that the instance has actually shut down. [^fn2]
   RESERVATION   r-0cb1d861      331055354537    default
   INSTANCE      i-b2719add      ami-76f0061f    stopped         hrworx-keypair          0 \
                 m1.small  2011-03-16T15:22:45+0000  us-east-1a  aki-407d9529              \
-                monitoring-disabled     ebs         paravirtual xen	
-  BLOCKDEVICE	/dev/sda1	vol-5a745032	2011-03-16T15:54:10.000Z	
+                monitoring-disabled     ebs         paravirtual xen
+  BLOCKDEVICE	/dev/sda1	vol-5a745032	2011-03-16T15:54:10.000Z
 {% endhighlight %}
 
 Restart the instance. Wait a minute for it to come up, then check to make sure that it's running.
@@ -163,8 +163,8 @@ Restart the instance. Wait a minute for it to come up, then check to make sure t
                 domU-12-31-39-09-48-D5.compute-1.internal       running hrworx-keypair  0 \
                 m1.small  2011-03-16T19:28:42+0000  us-east-1a  aki-407d9529              \
                 monitoring-disabled     50.16.85.142    10.210.79.35  ebs   paravirtual   \
-                xen	
-  BLOCKDEVICE   /dev/sda1       vol-5a745032    2011-03-16T19:28:59.000Z	
+                xen
+  BLOCKDEVICE   /dev/sda1       vol-5a745032    2011-03-16T19:28:59.000Z
 {% endhighlight %}
 
 Note that the public IP address changed from the previous run.
@@ -177,18 +177,18 @@ Log in, and go looking for the file that was stashed in `ec2-user`'s home direct
   Are you sure you want to continue connecting (yes/no)? yes
   Warning: Permanently added '50.16.85.142' (RSA) to the list of known hosts.
   Last login: Wed Mar 16 15:36:00 2011 from NNN-NNN-NNN-NNN.lightspeed.mssnks.sbcglobal.net
-   
+
          __|  __|_  )  Amazon Linux AMI
          _|  (     /     Beta
         ___|\___|___|
-   
+
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
   [ec2-user@domU-12-31-39-09-48-D5 ~]$ ls -l
   total 4
   -rw-rw-r-- 1 ec2-user ec2-user 6 Mar 16 15:51 persistent.txt
-  [ec2-user@domU-12-31-39-09-48-D5 ~]$ cat persistent.txt 
+  [ec2-user@domU-12-31-39-09-48-D5 ~]$ cat persistent.txt
   Woot!
-{% endhighlight %}  
+{% endhighlight %}
 
 Woot, indeed.
 
@@ -207,25 +207,25 @@ in the filesystem.
 {% highlight sh %}
   $ ec2-describe-volumes
   VOLUME  vol-006f4868  16  snap-cba692a1 us-east-1b  available 2011-03-17T01:53:49+0000
-   
+
   $ ec2-attach-volume vol-006f4868 -i i-b2719add -d /dev/sda2
   ATTACHMENT  vol-006f4868  i-b2719add  /dev/sda2 attaching 2011-03-17T02:55:11+0000
-   
+
   $ ssh -i $EC2_KEYPAIR ec2-user@50.16.85.142
   Last login: Thu Mar 17 02:58:49 2011 from NNN-NNN-NNN-NNN.lightspeed.mssnks.sbcglobal.net
-   
+
          __|  __|_  )  Amazon Linux AMI
          _|  (     /     Beta
         ___|\___|___|
-   
+
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
-   
+
   [ec2-user@ip-10-196-37-162 ~]$ mkdir mnt
   [ec2-user@ip-10-196-37-162 ~]$ sudo mount /dev/sdb1 mnt
   [ec2-user@ip-10-196-37-162 ~]$ ls -l mnt/home/ec2-user/
   total 4
   -rw-rw-r-- 1 ec2-user ec2-user 6 Mar 17 01:58 persistence.txt
-  [ec2-user@ip-10-196-37-162 ~]$ cat mnt/home/ec2-user/persistence.txt 
+  [ec2-user@ip-10-196-37-162 ~]$ cat mnt/home/ec2-user/persistence.txt
   Woot!
 {% endhighlight %}
 

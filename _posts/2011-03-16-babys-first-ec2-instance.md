@@ -39,14 +39,14 @@ is based on the American East Coast, I'm going to use `us-east`. Also, for this 
 I'm going to use a 32-bit instance from Amazon that uses S3 as a backing store.
 
 {% highlight sh %}
-  $ ec2-run-instances --group default --key ec2-keypair ami-d59d6bbc
+  $ ec2-run-instances --group default --key ec2-keypair ami-e8249881
 {% endhighlight %}
 
 About the parameters and their values:
 
 * Replace `ec2-keypair` with the name of the keypair you generated in the initial setup,
   if necessary.
-  
+
 Open the firewall for SSH and ICMP connections. Note that these operations are on a
 security group (`default` by, well, default); once you have done them once for your account,
 you shouldn't need to again. [^fn3]
@@ -65,7 +65,7 @@ Make sure that the instance is running:
                 ip-10-244-15-197.ec2.internal   running ec2-keypair             0         \
                 m1.small  2011-03-15T22:10:26+0000  us-east-1b  aki-407d9529              \
                 monitoring-disabled     50.17.139.123       10.244.15.197                 \
-                instance-store          paravirtual xen	
+                instance-store          paravirtual xen
   $ ping 50.17.139.123
   PING 50.17.139.123 (50.17.139.123): 56 data bytes
   64 bytes from 50.17.139.123: icmp_seq=0 ttl=43 time=83.324 ms
@@ -107,7 +107,7 @@ opened up the SSH port, we can log in as this user:
         ___|\___|___|
 
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
-  [ec2-user@ip-10-244-15-197 ~]$ 
+  [ec2-user@ip-10-244-15-197 ~]$
 {% endhighlight %}
 
 This is a full-fledged Linux system, albeit a little light on the installed packages. [^fn1]
@@ -117,7 +117,7 @@ You can do all the things you'd expect to be able to do on a Linux system:
   [ec2-user@ip-10-244-15-197 ~]$ yum check-update
   Loaded plugins: fastestmirror, security
   Skipping security plugin, no data
-   
+
   aws-amitools-ec2.noarch             1.3.57676-1.1.amzn1                     amzn
   aws-apitools-as.noarch              1.0.33.1-1.1.amzn1                      amzn
   aws-apitools-ec2.noarch             1.3.62308-1.1.amzn1                     amzn
@@ -138,7 +138,7 @@ You can do all the things you'd expect to be able to do on a Linux system:
   [ec2-user@ip-10-244-15-197 ~]$ sudo yum upgrade
   Loaded plugins: fastestmirror, security
   Loading mirror speeds from cached hostfile
-  amzn                                                     | 2.1 kB     00:00     
+  amzn                                                     | 2.1 kB     00:00
   Skipping security plugin, no data
   Setting up Upgrade Process
   Resolving Dependencies
@@ -197,5 +197,5 @@ up in `ec2-describe-instances` any more.
         lost. EBS-backed instances can be stopped without terminating, which means they
         remain known to EC2 and can be restarted again. I'll show an example of this in a
         later post.
-        
+
 [^fn3]: But it won't hurt if you do. You'll just get a warning to that effect.
