@@ -6,6 +6,6 @@ pygments: true
 safe: true
 source: .
 # my own overrides
-auto: true
+# auto: true    # deprecated
 markdown: maruku
 permalink: /:year/:month/:day/:title.html
