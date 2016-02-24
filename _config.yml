@@ -2,10 +2,10 @@
 # defaults used by Github Pages
 destination: ./_site
 lsi: false
-pygments: true
+highlighter: rouge
 safe: true
 source: .
 # my own overrides
 # auto: true    # deprecated
-markdown: maruku
+markdown: kramdown
 permalink: /:year/:month/:day/:title.html
