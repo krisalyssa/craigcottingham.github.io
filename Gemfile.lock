@@ -1,8 +1,11 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    TicGit-ng (1.0.2.18)
+      git
     colorator (0.1)
     ffi (1.9.10)
+    git (1.2.9.1)
     jekyll (3.1.2)
       colorator (~> 0.1)
       jekyll-sass-converter (~> 1.0)
@@ -33,7 +36,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  jekyll (~> 3.1.0)
+  TicGit-ng (~> 1.0)
+  git (~> 1.2)
+  jekyll (~> 3.1)
 
 BUNDLED WITH
    1.11.2
