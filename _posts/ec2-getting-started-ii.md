@@ -44,12 +44,16 @@ running Mac OS X or another Unix-like operating system, here's what you need to 
 Amazon provides a nice GUI interface to their web services, but I'm intending to automate the process of
 starting and stopping servers eventually, so learning to use the command line tools seems the smart thing to do.
 
+<div class="ed-note">
+  Note: Use `aws-cli` instead. See https://alestic.com/2013/08/awscli/
+</div>
+
 They can be downloaded from <http://aws.amazon.com/developertools/351>. After unpacking it,
 move the contents of the topmost folder to `~/ec2`.
 While you're at it, create a folder at `~/.ec2` (note the period) in which to store the
 AWS credentials.
 
-### Set up environment variables, part 1
+<!-- ### Set up environment variables, part 1
 
 Add these variables to your environment, and make sure they're loaded into your shell:
 
@@ -57,7 +61,7 @@ Add these variables to your environment, and make sure they're loaded into your 
   export EC2_HOME="$HOME/ec2"
   export EC2_PRIVATE_HOME="$HOME/.ec2"
   export PATH="$EC2_HOME/bin:$PATH"
-{% endhighlight %}
+{% endhighlight %} -->
 
 ### Set up AWS credentials
 
@@ -89,7 +93,7 @@ You'll also need to save the secret access key, so click on "Show" next to the a
 Copy this string and save it to a different file in `EC2_PRIVATE_HOME` (for instance,
 `aws-secret-access-key`).
 
-#### X.509 Certificates
+<!-- #### X.509 Certificates
 
 Next, click on the tab that reads "X.509 Certificates".
 
@@ -107,16 +111,18 @@ button in turn, and download the files to the directory named `EC2_PRIVATE_HOME`
 
 **Very important:** Amazon does not store your private key, so you can't download it again later.
 If you forget to download it, or lose it later, you'll have to deactivate this certificate and
-create a new one.
+create a new one. -->
+
+#### SSH Key Pair
 
 Finally, create an SSH keypair like so:
 
 {% highlight sh %}
-  $ ec2-add-keypair ec2-keypair -O `cat $EC2_PRIVATE_HOME/aws-access-key` -W `cat $EC2_PRIVATE_HOME/aws-secret-access-key` > $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
-  $ chmod 600 $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
+  $ aws ec2 create-key-pair --key-name ec2-keypair --query 'KeyMaterial' --output text > ~/.ssh/ec2-keypair.pem
+  $ chmod 600 ~/.ssh/ec2-keypair.pem
 {% endhighlight %}
 
-### Set up environment variables, part 2
+<!-- ### Set up environment variables, part 2
 
 Add these variables to your environment, and make sure they're loaded into your shell:
 
@@ -125,12 +131,12 @@ Add these variables to your environment, and make sure they're loaded into your 
   export EC2_PRIVATE_KEY="$EC2_PRIVATE_HOME/pk-XXXXXXXX.pem"
   export EC2_KEYPAIR="$EC2_PRIVATE_HOME/id_rsa-ec2-keypair"
   export EC2_KEYPAIR_NAME="ec2-keypair"
-{% endhighlight %}
+{% endhighlight %} -->
 
-## A final note
+<!-- ## A final note
 
 The command-line EC2 tools use Java, so make sure you have set up your Java environment
-correctly.
+correctly. -->
 
 [^fn1]: Note that I'm not endorsing EC2 over other solutions like
         [Rackspace Cloud](http://www.rackspace.com/cloud/), at least not yet.
