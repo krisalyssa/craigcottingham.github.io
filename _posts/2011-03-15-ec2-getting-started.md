@@ -1,11 +1,13 @@
 ---
 layout: post
-title: "Getting Started with Amazon EC2"
+title: "Getting Started with Amazon EC2 (Superceded)"
 categories:
 - cloud
 - ec2
 - linux
 ---
+> Note: This article has been replaced by [an updated version](http://craigcottingham.github.io/2016/08/15/ec2-getting-started-ii.html).
+
 At The Day Job, we've started moving some of our development processes to
 [Amazon EC2](http://aws.amazon.com/ec2/). Occasionally, we need to radically increase the
 processing power available for continuous integration, unit testing, and user acceptance
