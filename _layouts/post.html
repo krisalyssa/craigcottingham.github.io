@@ -11,9 +11,9 @@ layout: default
     <li><strong>updated:</strong> {{ page.updated | date: "%Y-%m-%d" }}</li>
     {% endif %}
     {% if page.categories %}
-    <li><strong>tags:</strong> {{ page.categories | join " " }}</li>
+    <li><strong>tags:</strong> {{ page.categories | join: " " }}</li>
     {% endif %}
-    <li><strong>comment:</strong> <a href="mailto:craig.cottingham@gmail.com?subject=Re: {{ page.title | urlencode }} (craigcottingham.github.com)">via email</a>
+    <li><strong>comment:</strong> <a href="mailto:craig.cottingham@gmail.com?subject=Re: {{ page.title | urlencode }} (craigcottingham.github.io)">via email</a>
     </li>
   </ul>
 </div>
