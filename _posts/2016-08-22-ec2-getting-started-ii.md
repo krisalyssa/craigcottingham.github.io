@@ -34,7 +34,7 @@ we're going to initialize a security group to use in further examples without go
 First, create the security group.
 
 {% highlight sh %}
-  $ aws ec2 create-security-group --group-name demo-sg
+  $ aws ec2 create-security-group --group-name demo-sg --description "For demonstration purposes"
 {% endhighlight %}
 
 You can name it something other than `demo-sg` if you desire, but make sure to use the new name from here on out.
