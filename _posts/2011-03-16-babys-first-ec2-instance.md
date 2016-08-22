@@ -1,13 +1,11 @@
 ---
 layout: post
-title: "Baby's First Amazon EC2 Instance (Superceded)"
+title: "Baby's First Amazon EC2 Instance"
 categories:
 - cloud
 - ec2
 - linux
 ---
-> Note: This article has been replaced by [an updated version](http://craigcottingham.github.io/2016/08/16/babys-first-ec2-instance-ii.html).
-
 Now that [Amazon EC2 has been set up](/2011/03/15/ec2-getting-started.html), it's time
 to create a server instance.
 
