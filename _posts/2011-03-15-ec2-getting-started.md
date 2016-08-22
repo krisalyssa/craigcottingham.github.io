@@ -6,7 +6,7 @@ categories:
 - ec2
 - linux
 ---
-> Note: This article has been replaced by [an updated version](http://craigcottingham.github.io/2016/08/15/ec2-getting-started-ii.html).
+> Note: This article has been replaced by [an updated version](/2016/08/22/ec2-getting-started-ii.html).
 
 At The Day Job, we've started moving some of our development processes to
 [Amazon EC2](http://aws.amazon.com/ec2/). Occasionally, we need to radically increase the
