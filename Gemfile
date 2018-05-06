@@ -6,6 +6,10 @@ source "https://rubygems.org" do
   gem "middleman-blog",         "~> 4.0.2"
   gem "middleman-livereload",   "~> 3.4.3"
 
+  # extension dependencies
+  gem "redcarpet",              "~> 3.3", ">= 3.3.3"
+  gem "builder",                "~> 3.0"
+
   # other gems
   gem "tzinfo-data",            platforms: [:mswin, :mingw, :jruby]
   gem "wdm",                    "~> 0.1", platforms: [:mswin, :mingw]
