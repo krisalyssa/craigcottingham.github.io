@@ -7,8 +7,9 @@ source "https://rubygems.org" do
   gem "middleman-livereload",   "~> 3.4.3"
 
   # extension dependencies
-  gem "redcarpet",              "~> 3.3", ">= 3.3.3"
   gem "builder",                "~> 3.0"
+  gem "redcarpet",              "~> 3.3", ">= 3.3.3"
+  gem "nokogiri"
 
   # other gems
   gem "tzinfo-data",            platforms: [:mswin, :mingw, :jruby]
