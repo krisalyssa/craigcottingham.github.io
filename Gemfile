@@ -3,6 +3,7 @@ source "https://rubygems.org" do
 
   # extensions
   gem "middleman-autoprefixer", "~> 2.7"
+  gem "middleman-blog",         "~> 4.0.2"
   gem "middleman-livereload",   "~> 3.4.3"
 
   # other gems
