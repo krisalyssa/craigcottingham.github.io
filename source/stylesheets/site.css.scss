@@ -1,24 +1,116 @@
-body {
-  background-color: #fbc547;
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, "Avenir Next", "Avenir",
-    "Segoe UI", "Lucida Grande", "Helvetica Neue", "Helvetica", "Fira Sans",
-    "Roboto", "Noto", "Droid Sans", "Cantarell", "Oxygen", "Ubuntu",
-    "Franklin Gothic Medium", "Century Gothic", "Liberation Sans", sans-serif;
-  padding: 18vh 1rem;
-  text-align: center;
-}
+// @import "bootstrap/bootstrap";
+
+// variables
+
+$background_color: #FFFFFF;
+$text_color: #221144;
+$header_color: #DDDDDD;
+$footer_color: #DDDDDD;
+
+// mixins
+
+// global styles
 
 a {
-  color: rgba(#000, 0.7);
+  border-bottom: dotted thin;
+  border: none;
+  color: $text_color;
+  text-decoration: none;
 
   &:focus,
   &:hover {
-    color: rgba(#000, 0.6);
+    border-bottom: solid thin;
+    border: none;
+    color: $text_color;
+    text-decoration: none;
   }
 }
 
-.middleman-logo {
-  margin-bottom: 1rem;
-  width: 10rem;
+// structured styles
+
+body { @extend .container-fluid;
+  background-color: $background_color;
+  padding: 0;
+
+  > header {
+    background-color: $header_color;
+    text-align: center;
+
+    > h1 {
+      font-size: 48px;
+    }
+
+    > p {
+      font-style: italic;
+    }
+  }
+
+  > footer {
+    background-color: $footer_color;
+    bottom: 0;
+    font-size: 12px;
+    left: 0;
+    position: absolute;
+    right: 0;
+    text-align: center;
+  }
+}
+
+
+.navbar-brand {
+  border-bottom: none;
+  // font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
+  font-size: 3em;
+  padding-top: 22px;
+  position: relative;
+  > img {
+    // position: absolute;
+    // top: 16px;
+    // left: -113px;
+  }
+
+  &:focus,
+  &:hover {
+    text-decoration: none;
+    border: none;
+    border-bottom: none;
+  }
+}
+
+// header {
+//   position: fixed;
+//   top: 0;
+//   z-index: 10;
+//   height: 121px;
+//   width: 100%;
+//   margin-bottom: 0;
+//   background: rgb(237, 237, 237) none;
+// }
+
+// footer {
+//   position: fixed;
+//   bottom: 0;
+//   z-index: 10;
+//   width: 100%;
+//   padding: 0.5em 0;
+//   background: rgb(237, 237, 237) none;
+// }
+
+
+
+
+.black {
+  color: rgb(0, 0, 0);
+}
+
+.blue {
+  color: rgb(0, 25, 181);
+}
+
+.dark-gray {
+  color: rgb(128, 128, 128);
+}
+
+.light-gray {
+  color: rgb(171, 171, 171);
 }
