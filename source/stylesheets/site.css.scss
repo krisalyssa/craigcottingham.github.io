@@ -13,17 +13,13 @@ $footer_color: #EEEEEE;
 // global styles
 
 a {
-  border: none;
-  border-bottom: dotted thin;
   color: $text_color;
-  text-decoration: none;
+  text-decoration: underline #AAAAAA;
 
   &:focus,
   &:hover {
-    border-bottom: solid thin;
-    border: none;
     color: $text_color;
-    text-decoration: none;
+    text-decoration: underline black;
   }
 }
 
@@ -46,6 +42,10 @@ body { @extend .container-fluid;
   > header {
     border-bottom: 2px solid #DDDDDD;
     text-align: center;
+
+    a {
+      text-decoration: none;
+    }
 
     > h1 {
       font-size: 48px;
