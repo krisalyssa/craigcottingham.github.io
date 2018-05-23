@@ -13,8 +13,8 @@ $footer_color: #EEEEEE;
 // global styles
 
 a {
-  border-bottom: dotted thin;
   border: none;
+  border-bottom: dotted thin;
   color: $text_color;
   text-decoration: none;
 
@@ -39,6 +39,8 @@ h1, h2, h3, h4, h5, h6 {
 
 body { @extend .container-fluid;
   background-color: $background_color;
+  font-family: "Source Serif Pro", serif;
+  font-size: 20px;
   padding: 0;
 
   > header {
@@ -68,7 +70,8 @@ body { @extend .container-fluid;
 }
 
 main {
-  font-family: "Source Serif Pro", serif;
+  margin: 2em auto 6em;
+  width: 720px;
 }
 
 
