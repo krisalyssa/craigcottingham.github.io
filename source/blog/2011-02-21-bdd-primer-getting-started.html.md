@@ -17,18 +17,18 @@ this writing, I'm using versions 1.9.2 and 3.0.4 respectively.
 
 Create a new Rails application:
 
-{% highlight sh %}
+```shell
   $ rails new bdd
   $ cd bdd
   $ git init .
   $ git commit -a -m 'Initial import'
-{% endhighlight %}
+```
 
 Now run `rails server` and point your browser at http://localhost:3000/ to make sure that it runs.
 
 Edit `Gemfile` and add these lines to the bottom:
 
-{% highlight ruby %}
+```ruby
   group :development, :test do
     gem "rspec-rails", "~> 2.4"
     gem 'capybara'
@@ -38,7 +38,7 @@ Edit `Gemfile` and add these lines to the bottom:
     gem 'spork'
     gem 'launchy'
   end
-{% endhighlight %}
+```
 
 Then run `bundle install` to update gems. Run `rails server` again as a sanity check.
 
@@ -46,51 +46,51 @@ Then run `bundle install` to update gems. Run `rails server` again as a sanity c
 
 Install RSpec into the application:
 
-{% highlight sh %}
+```shell
   $ rails generate rspec:install
-{% endhighlight %}
+```
 
 Configure the application to create specs instead of unit tests. Edit
 `config/application.rb` and add to the bottom of the class definition:
 
-{% highlight ruby %}
+```ruby
   config.generators do | g |
     g.test_framework :rspec
   end
-{% endhighlight %}
+```
 
 ## Set up Cucumber
 
 Install Cucumber into the application:
 
-{% highlight sh %}
+```shell
   $ rails generate cucumber:install --rspec --capybara
-{% endhighlight %}
+```
 
 ## Test it out
 
 First, generate the database:
 
-{% highlight sh %}
+```shell
   $ rake db:migrate
-{% endhighlight %}
+```
 
 Make sure RSpec doesn't choke:
 
-{% highlight sh %}
+```shell
   $ rake spec
   No examples matching ./spec/**/*_spec.rb could be found
-{% endhighlight %}
+```
 
 And that Cucumber doesn't, either:
 
-{% highlight sh %}
+```shell
   $ rake cucumber
   bundle exec ...
   Using the default profile...
   0 scenarios
   0 steps
   0m0.000s
-{% endhighlight %}
+```
 
 Now we're ready to start writing features and specs.

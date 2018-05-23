@@ -39,17 +39,17 @@ we're going to initialize a security group to use in further examples without go
 
 First, create the security group.
 
-{% highlight sh %}
+```shell
   $ aws ec2 create-security-group --group-name demo-sg --description "For demonstration purposes"
-{% endhighlight %}
+```
 
 You can name it something other than `demo-sg` if you desire, but make sure to use the new name from here on out.
 
 We'll want to use SSH to log in to the instances we boot, so we need to enable traffic through the default SSH port.
 
-{% highlight sh %}
+```shell
   $ aws ec2 authorize-security-group-ingress --group-name demo-sg --protocol tcp --port 22 --cidr 0.0.0.0/0
-{% endhighlight %}
+```
 
 For added security, we could restrict logins to only those from a single IP address or a range of IP addresses.
 Here, we're allowing logins from any IP address, which should be fine for our purposes.
@@ -59,10 +59,10 @@ Here, we're allowing logins from any IP address, which should be fine for our pu
 Instead of having to remember passwords for each EC2 instance, which should be both complex and unique,
 we'll set up an SSH key pair, half of which will remain private and local to your local computer.
 
-{% highlight sh %}
+```shell
   $ aws ec2 create-key-pair --key-name demo-keypair --query 'KeyMaterial' --output text > ~/.ssh/demo-keypair.pem
   $ chmod 400 ~/.ssh/demo-keypair.pem
-{% endhighlight %}
+```
 
 As with the security group, you can name it otherwise, but be sure to change the following examples as appropriate.
 

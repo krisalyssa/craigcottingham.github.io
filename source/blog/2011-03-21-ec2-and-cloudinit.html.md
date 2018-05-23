@@ -48,14 +48,14 @@ stingy with what you try to use, or install packages before using them.
 As a simple example, here's a user data script named `user-script.txt` that will write to a file named
 `user-script-output.txt` [^fn3] in the home directory of the `ec2-user` user.
 
-{% highlight sh %}
+```shell
   #!/bin/sh
   echo 'Woot!' > /home/ec2-user/user-script-output.txt
-{% endhighlight %}
+```
 
 And here it is in action.
 
-{% highlight sh %}
+```shell
   $ ec2-run-instances --group default --key $EC2_KEYPAIR_NAME -f user-script.txt ami-d59d6bbc
   $ ec2-describe-instances
   RESERVATION   r-92c5b7ff      331055354537    default
@@ -73,7 +73,7 @@ And here it is in action.
   -rw-r--r-- 1 root root 6 Mar 20 04:22 user-script-output.txt
   [ec2-user@domU-12-31-39-15-64-0E ~]$ cat user-script-output.txt
   Woot!
-{% endhighlight %}
+```
 
 ## Include files
 
@@ -106,7 +106,7 @@ processed consecutively or concurrently as well.
 
 The first script is named `script-1.sh`.
 
-{% highlight sh %}
+```shell
   #!/bin/sh
   HOME=/home/ec2-user
   sleep 20
@@ -121,11 +121,11 @@ The first script is named `script-1.sh`.
   else
     echo 'script-3 has not run' >> $HOME/script-1-output.txt
   fi
-{% endhighlight %}
+```
 
 The second script is named, naturally, `script-2.sh`.
 
-{% highlight sh %}
+```shell
   #!/bin/sh
   HOME=/home/ec2-user
   sleep 10
@@ -140,11 +140,11 @@ The second script is named, naturally, `script-2.sh`.
   else
     echo 'script-3 has not run' >> $HOME/script-2-output.txt
   fi
-{% endhighlight %}
+```
 
 Working out what the third script is named is left as an exercise for the reader. :-)
 
-{% highlight sh %}
+```shell
   #!/bin/sh
   HOME=/home/ec2-user
   echo 'running' > $HOME/script-3-output.txt
@@ -158,21 +158,21 @@ Working out what the third script is named is left as an exercise for the reader
   else
     echo 'script-2 has not run' >> $HOME/script-3-output.txt
   fi
-{% endhighlight %}
+```
 
 Next, we need an include file which references all three of these user data scripts,
 called `include.txt`.
 
-{% highlight sh %}
+```shell
   #include
   http://craigcottingham.github.com/code/cloud-init/script-1.sh
   http://craigcottingham.github.com/code/cloud-init/script-2.sh
   http://craigcottingham.github.com/code/cloud-init/script-3.sh
-{% endhighlight %}
+```
 
 And here it is in action.
 
-{% highlight sh %}
+```shell
   $ ec2-run-instances --group default --key $EC2_KEYPAIR_NAME -f include.txt ami-d59d6bbc
   $ ec2-describe-instances
   RESERVATION   r-b40d76d9      331055354537    default
@@ -200,7 +200,7 @@ And here it is in action.
   running
   script-1 has run
   script-2 has run
-{% endhighlight %}
+```
 
 So here we have empirical evidence that the included user data scripts are run consecutively
 rather than concurrently.

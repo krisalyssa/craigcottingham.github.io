@@ -56,14 +56,14 @@ the same tarball for all of our servers, and I like to minimize typing where pos
 A full list of attributes can be seen at <http://wiki.opscode.com/display/chef/Chef+Configuration+Settings>.
 However, note that not all of those attributes are used by Chef Solo.
 
-{% highlight ruby %}
+```ruby
   file_cache_path  "/var/chef"
   cookbook_path    "/var/chef/cookbooks"
   recipe_url       "https://s3.amazonaws.com/craigcottingham-blog/chef/cookbooks.tar.gz"
   log_level        :info
   log_location     "/var/log/chef.log"  # or STDOUT
   verbose_logging  true
-{% endhighlight %}
+```
 
 ### Second course: `cookbooks.tar.gz` [(download)](/code/chef/cookbooks.tar.gz)
 
@@ -72,7 +72,7 @@ This is something that you have to build yourself; think of it as your personal 
 cookbooks selected from all the cookbooks out there. At a minimum, the tarball should have an
 internal layout something like:
 
-{% highlight sh %}
+```shell
   cookbooks/
     build-essential/
       ...
@@ -80,7 +80,7 @@ internal layout something like:
       ...
     rvm
       ...
-{% endhighlight %}
+```
 
 If you include roles, they should be in a directory named `roles` at the top level, as a sibling of
 `cookbooks`.
@@ -110,7 +110,7 @@ The most important part of the JSON fragment is the `run_list` value. This tells
 to use to configure the node. The remainder of the JSON fragment supplies data used by the recipes.
 Obviously, the data supplied depends on the recipes; you'll need to check the documentation.
 
-{% highlight javascript %}
+```javascript
   {
     "run_list": [
       "recipe[build-essential]",
@@ -142,7 +142,7 @@ Obviously, the data supplied depends on the recipes; you'll need to check the do
       }
     }
   }
-{% endhighlight %}
+```
 
 Recipes should list other recipes they depend on in their metadata, so the order of recipes in the
 run list should not be significant. I'm not sure how much to trust the declared dependencies, so
@@ -164,7 +164,7 @@ Second, create a shell script something like the following and save it locally. 
 the same place as the other files for safekeeping, but it needs to be readable _as a file_ by the
 `ec2run` command. (If you want, you can [download](/code/chef/mynode.sh) it from this web site.)
 
-{% highlight sh %}
+```shell
   #!/bin/sh
 
   # start EC2 instance with
@@ -191,7 +191,7 @@ the same place as the other files for safekeeping, but it needs to be readable _
   # run Chef
   chef-solo -c /etc/chef/config.rb \
             -j https://s3.amazonaws.com/craigcottingham-blog/chef/mynode.json
-{% endhighlight %}
+```
 
 Finally, create the new EC2 instance, passing the name of the shell script with the `-f` parameter.
 
