@@ -24,7 +24,7 @@ The Linux images from both Amazon and Canonical include a package called
 ## Hey, you, get onto my cloud
 
 CloudInit runs as a process at boot time. You pass data to it when launching the instance, via
-either the `-d user_data` or `-f user_data_file` command-line options to `ec2-run-instances` [^fn1].
+either the `-d user_data` or `-f user_data_file` command-line options to `ec2-run-instances` [^1].
 CloudInit interprets the data, handles it appropriately, then exits.
 
 For the sake of repeatability, passing data directly on the command line seems like a bad idea.
@@ -36,7 +36,7 @@ CloudInit can handle user data in a number of different formats. Let's look at s
 ## User data scripts
 
 The simplest and most straightforward format is the user data script. User data scripts are identified
-by a first line starting with `#!` [^fn2]. The user data is written to a file on the newly-created
+by a first line starting with `#!` [^2]. The user data is written to a file on the newly-created
 instance, which is then executed as root by the Unix program loader "very late in the boot sequence"
 (according to the documentation). In essence, a user data script can look like nearly any normal
 Unix script.
@@ -46,7 +46,7 @@ be available in the instance before you try to execute it. This usually means yo
 stingy with what you try to use, or install packages before using them.
 
 As a simple example, here's a user data script named `user-script.txt` that will write to a file named
-`user-script-output.txt` [^fn3] in the home directory of the `ec2-user` user.
+`user-script-output.txt` [^3] in the home directory of the `ec2-user` user.
 
 ```shell
   #!/bin/sh
@@ -100,7 +100,7 @@ likely not your workstation or laptop), but then they're in a central location, 
 all of your EC2 instances as needed. As an added benefit, if you store them on S3, the bandwidth
 to read them isn't metered and doesn't incur additional charges.
 
-For this example, we'll create three user data scripts, upload them to the Web [^fn4], then create an
+For this example, we'll create three user data scripts, upload them to the Web [^4], then create an
 include file which references all three. We'll do a simple test of whether the includes are
 processed consecutively or concurrently as well.
 
@@ -214,10 +214,10 @@ Amazon AMIs.
 
 If you need code to execute earlier than "late in the boot process", the `cloud-boothook` is
 available. It appears to function similar to a user data script, with the additional
-restriction that it should be idempotent [^fn5]. I was unable to find an example in the
+restriction that it should be idempotent [^5]. I was unable to find an example in the
 documentation, so I don't know anything more about this data format.
 
-Similarly, you can define upstart [^fn6] jobs directly with the `upstart-job` data format.
+Similarly, you can define upstart [^6] jobs directly with the `upstart-job` data format.
 
 You can specify more than one data format in a single file by formatting it as a mime-multipart
 message. I can see this as preferable to the include file only if all of the data is already
@@ -234,17 +234,14 @@ user data file. Gzip compression can help with that, but there's still a hard li
 run in to. I'll talk about a possible solution in an upcoming post.
 
 
-[^fn1]: Or perhaps both. I haven't seen examples of using both, and best as I can tell there's nothing
-        in the documentation that says you can't use both in a single invocation. That's probably
-        worth trying.
+[^1]: Or perhaps both. I haven't seen examples of using both, and best as I can tell there's nothing in the documentation that says you can't use both in a single invocation. That's probably worth trying.
 
-[^fn2]: The [shebang](http://en.wikipedia.org/wiki/Shebang_%28Unix%29).
+[^2]: The [shebang](http://en.wikipedia.org/wiki/Shebang_%28Unix%29).
 
-[^fn3]: Okay, so I could be more creative in naming my files.
+[^3]: Okay, so I could be more creative in naming my files.
 
-[^fn4]: I'm not using S3 for this example just because I like keeping the example files for this blog
-        with the rest of the files for the blog.
+[^4]: I'm not using S3 for this example just because I like keeping the example files for this blog with the rest of the files for the blog.
 
-[^fn5]: ["repeated applications have the same effect as one"](http://dictionary.reference.com/browse/idempotent).
+[^5]: ["repeated applications have the same effect as one"](http://dictionary.reference.com/browse/idempotent).
 
-[^fn6]: A replacement for `sysvinit`.
+[^6]: A replacement for `sysvinit`.

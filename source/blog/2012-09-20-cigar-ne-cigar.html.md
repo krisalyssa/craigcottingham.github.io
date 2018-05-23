@@ -1,5 +1,5 @@
 ---
-title: Sometimes &ldquo;a cigar&rdquo; is not &ldquo;a cigar&rdquo;
+title: Sometimes "a cigar" is not "a cigar"
 categories:
 - ruby
 - encoding
@@ -11,7 +11,7 @@ This is what I found on the way back out.
 ## A simple filesystem-backed app
 
 We start with a bare-bones Rails application, using Ruby 1.9.3-p194 and Rails 3.2.8
-on Mac OS X 10.8.[^fn1] There&rsquo;s only one model, City, with a single attribute named
+on Mac OS X 10.8. [^1] There's only one model, City, with a single attribute named
 `name`.
 
 ```shell
@@ -21,8 +21,8 @@ on Mac OS X 10.8.[^fn1] There&rsquo;s only one model, City, with a single attrib
   $ rake db:migrate
 ```
 
-We&rsquo;ll make one modification to the model class: when a new instance is created,
-a new directory will be created in `public/files` named with the value of `name`.[^fn2]
+We'll make one modification to the model class: when a new instance is created,
+a new directory will be created in `public/files` named with the value of `name`. [^2]
 
 ```ruby
   require 'fileutils'
@@ -64,7 +64,7 @@ So far, so good.
 ## Bulk importing new records
 
 A useful feature would be to create folders in our common directory and tell the app
-to import them. It turns out it&rsquo;s easy to start adding.
+to import them. It turns out it's easy to start adding.
 
 ```ruby
   class CitiesController < ApplicationController
@@ -83,8 +83,8 @@ to import them. It turns out it&rsquo;s easy to start adding.
     ...
 ```
 
-Note that for now we&rsquo;re just printing out the name of each directory we find
-that isn&rsquo;t already in the database.
+Note that for now we're just printing out the name of each directory we find
+that isn't already in the database.
 
 To test it, create a directory in `public/files` and call the `import` method in the
 Rails console.
@@ -102,12 +102,12 @@ Rails console.
   1.9.3p194 :003 >
 ```
 
-Wait -- what&rsquo;s Düsseldorf doing in this list?
+Wait -- what's Düsseldorf doing in this list?
 
 ## Narrowing down the problem space
 
-One way Düsseldorf stands out is that it&rsquo;s the only city name with a non-ASCII character
-in it. To see if that&rsquo;s relevant, create another city through the browser UI with a
+One way Düsseldorf stands out is that it's the only city name with a non-ASCII character
+in it. To see if that's relevant, create another city through the browser UI with a
 non-ASCII character in its name.
 
 (Insert image of the cities new form here.)
@@ -130,13 +130,13 @@ It looks like non-ASCII characters are at least part of the problem.
 Specifically, [encodings](http://blog.grayproductions.net/articles/what_is_a_character_encoding).
 
 James Edward Gray II does a much better job of explaining encodings than I can, and so
-I can&rsquo;t recommend his blog posts on the topic enough. Suffice it to say that two strings
+I can't recommend his blog posts on the topic enough. Suffice it to say that two strings
 may appear to be identical when presented on the screen, but if their encodings are
-different they won&rsquo;t necessarily be equivalent in Ruby.
+different they won't necessarily be equivalent in Ruby.
 
 `String#encoding` will report the encoding for a string. First, though, we have to stash
-the string we&rsquo;re getting back from the filesystem so we can access it in the console.
-(We probably should remove the directories for Köln and Edinburgh first, so we&rsquo;re just
+the string we're getting back from the filesystem so we can access it in the console.
+(We probably should remove the directories for Köln and Edinburgh first, so we're just
 looking at Düsseldorf.)
 
 ```ruby
@@ -175,14 +175,14 @@ looking at Düsseldorf.)
    => false
 ```
 
-Okay, so it&rsquo;s not the encoding. Both strings are UTF-8, and appear to have the same glyphs,
-but aren&rsquo;t binary equivalent.
+Okay, so it's not the encoding. Both strings are UTF-8, and appear to have the same glyphs,
+but aren't binary equivalent.
 
 ## And now the title of this post makes more sense
 
 After some judicious (and lucky) searching, I found this statement on the Unicode web site:
 
-> For round-trip compatibility with existing standards, Unicode has encoded many entities that are really variants of the same abstract character.[^fn3]
+> For round-trip compatibility with existing standards, Unicode has encoded many entities that are really variants of the same abstract character. [^3]
 
 In other words, there can be more than one binary representation for a given string.
 
@@ -193,7 +193,7 @@ Rather than try to roll our own normalization code, we can use the
 [ActiveSupport::Multibyte::Unicode](http://api.rubyonrails.org/classes/ActiveSupport/Multibyte/Unicode.html)
 module, which was added to Rails 3.0. The `normalize` function takes a string and a symbol representing a
 normalization form, and returns the normalized string. According to the API documentation, the `:kc` form is
-preferred for interoperability, but as long as you normalize both strings you&rsquo;re comparing with the same
+preferred for interoperability, but as long as you normalize both strings you're comparing with the same
 normalization form, they should be comparable.
 
 ```shell
@@ -209,14 +209,11 @@ normalization form, they should be comparable.
 
 1. Unicode is not always Unicode. Two strings which look the same to a person viewing them may not look the
    same to your code.
-2. If you&rsquo;re taking string from disparate sources, like a database, a filesystem, and/or a web browser, you
+2. If you're taking string from disparate sources, like a database, a filesystem, and/or a web browser, you
    may need to normalize one or more of them for them to be binary equivalent.
 
-[^fn1]: I don&rsquo;t know how much of this is relevant to the coming tale.
-        Ruby 1.9 probably is, as is some flavor of OS X. Rails will be used
-        in the solution. All this will be explained later.
+[^1]: I don't know how much of this is relevant to the coming tale. Ruby 1.9 probably is, as is some flavor of OS X. Rails will be used in the solution. All this will be explained later.
 
-[^fn2]: Think iTunes -- metadata in a database, with binary large objects stored
-        on the filesystem.
+[^2]: Think iTunes -- metadata in a database, with binary large objects stored on the filesystem.
 
-[^fn3]: <http://www.unicode.org/reports/tr15/tr15-29.html#Introduction>
+[^3]: <http://www.unicode.org/reports/tr15/tr15-29.html#Introduction>

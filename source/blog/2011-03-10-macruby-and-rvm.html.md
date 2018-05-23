@@ -7,7 +7,7 @@ categories:
 - ruby
 ---
 Mac OS X, being a modern operating system, has a rich development environment in Cocoa.
-Based on Objective-C, a highly-object-oriented language blending C [^fn1] and Smalltalk,
+Based on Objective-C, a highly-object-oriented language blending C [^1] and Smalltalk,
 Cocoa provides an extensive class hierarchy not only for the user interface, but nearly
 the entire operating system. Better yet, the development community has made available
 lots of third-party code, enabling you to make your Cocoa apps that much better.
@@ -22,7 +22,7 @@ Rails.
 
 Objective-C has at its fingertips the whole of the Mac OS X UI and operating system,
 but it's a compiled language, which makes exploring and prototyping slow and sometimes
-cumbersome. Ruby is interpreted [^fn2], which makes it fast in which to develop, but
+cumbersome. Ruby is interpreted [^2], which makes it fast in which to develop, but
 being written with broad platform support in mind, it doesn't have direct access to the
 rich Cocoa environment.
 
@@ -85,7 +85,6 @@ This is where MacRuby really shines -- `irb` gives you interactive access to Coc
 For maximum [Soviet sub captain with a Scottish accent](http://www.imdb.com/title/tt0099810/)
 goodness, turn your volume up first.
 
-[^fn1]: Once described as "combining the power of assembly language with the complexity
-        of assembly language".
+[^1]: Once described as "combining the power of assembly language with the complexity of assembly language".
 
-[^fn2]: Not entirely, but the distinction is beyond the scope of this post.
+[^2]: Not entirely, but the distinction is beyond the scope of this post.

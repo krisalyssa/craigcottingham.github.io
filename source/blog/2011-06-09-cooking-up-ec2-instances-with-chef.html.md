@@ -20,7 +20,7 @@ files, downloading data, etc.), applying _attributes_ as necessary for per-insta
 (such as differences between staging and production servers). Normally, recipes and other data
 are staged to a central configuration server (either Opscode's or one you host yourself), but for
 simplicity's sake I'm going to use Chef Solo, which doesn't use a central server but assumes that
-all the necessary files are local. [^fn1]
+all the necessary files are local. [^1]
 
 In the discussion below, _node_ refers to a computer on which Chef Solo is being run. In most cases,
 it will probably be a server, but I suppose Opscode chose to use a different term to avoid confusion
@@ -51,7 +51,7 @@ logging. Chef provides a DSL, which simplifies the syntax. There are two require
 
 Not required but very useful is `recipe_url`. This is a URL pointing to the cookbooks tarball
 (described in more detail below). You can pass this URL to `chef-solo` when you run it, but I use
-the same tarball for all of our servers, and I like to minimize typing where possible. [^fn2]
+the same tarball for all of our servers, and I like to minimize typing where possible. [^2]
 
 A full list of attributes can be seen at <http://wiki.opscode.com/display/chef/Chef+Configuration+Settings>.
 However, note that not all of those attributes are used by Chef Solo.
@@ -67,7 +67,7 @@ However, note that not all of those attributes are used by Chef Solo.
 
 ### Second course: `cookbooks.tar.gz` [(download)](/code/chef/cookbooks.tar.gz)
 
-The cookbooks tarball contains the recipes [^fn3] that Chef Solo will reference when running.
+The cookbooks tarball contains the recipes [^3] that Chef Solo will reference when running.
 This is something that you have to build yourself; think of it as your personal playlist of
 cookbooks selected from all the cookbooks out there. At a minimum, the tarball should have an
 internal layout something like:
@@ -106,7 +106,7 @@ The good news is that it's a JSON fragment, so it's a standard data format which
 be familiar with. The bad news is that it's a JSON fragment, which means that's it's extremely sensitive
 to bad syntax (like dangling commas) and you aren't allowed to comment in-line.
 
-The most important part of the JSON fragment is the `run_list` value. This tells Chef Solo what recipes [^fn4]
+The most important part of the JSON fragment is the `run_list` value. This tells Chef Solo what recipes [^4]
 to use to configure the node. The remainder of the JSON fragment supplies data used by the recipes.
 Obviously, the data supplied depends on the recipes; you'll need to check the documentation.
 
@@ -217,10 +217,10 @@ Many thanks to Fabio Akita for
 [Cooking Solo with Chef](http://akitaonrails.com/2010/02/20/cooking-solo-with-chef), which pointed me
 in the right direction for jumping headlong in to Chef.
 
-[^fn1]: Which sounds like we're going to run into the 16K limit again. Bear with me.
+[^1]: Which sounds like we're going to run into the 16K limit again. Bear with me.
 
-[^fn2]: Not that you'd know it from reading this blog. Unless you look at the posting frequency.
+[^2]: Not that you'd know it from reading this blog. Unless you look at the posting frequency.
 
-[^fn3]: And roles, which I'll talk about in a future post.
+[^3]: And roles, which I'll talk about in a future post.
 
-[^fn4]: See footnote 3.
+[^4]: See footnote 3.

@@ -25,7 +25,7 @@ As you would expect, RVM makes JRuby look like your normal Ruby:
 Wait -- 1.8.7? What is this,
 [2008](http://www.ruby-lang.org/en/news/2008/05/31/ruby-1-8-7-has-been-released/)?
 
-As it turns out, JRuby doesn't officially implement Ruby 1.9 in version 1.5.6. [^fn1]
+As it turns out, JRuby doesn't officially implement Ruby 1.9 in version 1.5.6. [^1]
 The key word is "officially", as it's possible to enable 1.9 support with an environment
 variable:
 
@@ -54,5 +54,4 @@ Just as MacRuby is Ruby tied to Cocoa, so JRuby is Ruby tied to Java:
    => "Hello world!"
 ```
 
-[^fn1]: JRuby 1.6.0, which should be out Any Day Now, is supposed to be fully compatible with
-        Ruby 1.9.2.
+[^1]: JRuby 1.6.0, which should be out Any Day Now, is supposed to be fully compatible with Ruby 1.9.2.

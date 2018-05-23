@@ -121,7 +121,7 @@ Much better.
 ## Test the persistence
 
 Now, it would be good to prove to ourselves that the filesystem survives the instance being shutdown
-and restarted. Copy some text to a file in the `ec2-user`'s home directory. [^fn1]
+and restarted. Copy some text to a file in the `ec2-user`'s home directory. [^1]
 
 ```shell
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ echo 'Woot!' > persistent.txt
@@ -140,7 +140,7 @@ the instance should stop rather than terminate, when we launched it).
   Connection to 50.17.77.114 closed.
 ```
 
-Check that the instance has actually shut down. [^fn2]
+Check that the instance has actually shut down. [^2]
 
 ```shell
   $ ec2din
@@ -196,7 +196,7 @@ Woot, indeed.
 Let's say that some process in an EBS-backed instance went haywire, corrupting the disk
 enough that starting the instance causes it to lock up, and you can't even log into it
 to clean it up or even figure out what's gone wrong. If this were a physical computer
-with a physical hard drive [^fn3] we could pull the drive and put it into another
+with a physical hard drive [^3] we could pull the drive and put it into another
 computer, or boot off of a different volume like a CD.
 
 The comparable thing in the EC2 realm is to attach the volume to a running instance.
@@ -236,11 +236,8 @@ containing `false` for "delete on termination", the EBS volume will be retained 
 the EC2 instance has been terminated and garbage collected. If you don't want to keep incurring
 charges for it, don't forget to delete it as well.
 
-[^fn1]: Believe it or not, single quotes instead of double quotes in that `echo`
-        make a difference.
+[^1]: Believe it or not, single quotes instead of double quotes in that `echo` make a difference.
 
-[^fn2]: The EC2 command-line tools come in two forms: a longer, verbose form and a shorter form.
-        `ec2din` is the shorter form of `ec2-describe-instances`.
+[^2]: The EC2 command-line tools come in two forms: a longer, verbose form and a shorter form. `ec2din` is the shorter form of `ec2-describe-instances`.
 
-[^fn3]: Well, yeah, there's obviously a physical computer with a physical hard drive
-        _somewhere_.
+[^3]: Well, yeah, there's obviously a physical computer with a physical hard drive _somewhere_.

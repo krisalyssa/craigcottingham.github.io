@@ -11,7 +11,7 @@ At The Day Job, we've started moving some of our server infrastructure to
 [Amazon EC2](http://aws.amazon.com/ec2/). Occasionally, we need to radically increase the
 processing power available for continuous integration, unit testing, and user acceptance
 testing, but don't want to incur the cost of all that horsepower when we don't need it.
-Cloud-based solutions like EC2 [^fn1] are a good fit for this kind of on-demand usage.
+Cloud-based solutions like EC2 [^1] are a good fit for this kind of on-demand usage.
 
 ## One-time setup
 
@@ -70,6 +70,4 @@ As with the security group, you can name it otherwise, but be sure to change the
 
 The following posts in this series will assume that these steps have already been taken.
 
-[^fn1]: Note that I'm not endorsing EC2 over other solutions like
-        [Rackspace Cloud](http://www.rackspace.com/cloud/), at least not yet.
-        EC2 is just what I'm working with at the moment.
+[^1]: Note that I'm not endorsing EC2 over other solutions like [Rackspace Cloud](http://www.rackspace.com/cloud/), at least not yet. EC2 is just what I'm working with at the moment.

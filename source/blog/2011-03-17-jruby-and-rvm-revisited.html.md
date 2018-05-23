@@ -11,7 +11,7 @@ via RVM. In a footnote, I mentioned
 > JRuby 1.6.0, which should be out Any Day Now, is supposed to be fully compatible with
 > Ruby 1.9.2.
 
-Well, kids, that day is today. [^fn1]
+Well, kids, that day is today. [^1]
 
 First update RVM to version 1.2.9 or higher.
 
@@ -63,4 +63,4 @@ one.
 ```
 
 
-[^fn1]: Actually, two days ago. That's not important right now.
+[^1]: Actually, two days ago (as of this writing). That's not important right now.

@@ -48,7 +48,7 @@ About the parameters and their values:
 
 Open the firewall for SSH and ICMP connections. Note that these operations are on a
 security group (`default` by, well, default); once you have done them once for your account,
-you shouldn't need to again. [^fn3]
+you shouldn't need to again. [^1]
 
 ```shell
   $ ec2-authorize default -P tcp -p 22 -s 0.0.0.0/0
@@ -109,7 +109,7 @@ opened up the SSH port, we can log in as this user:
   [ec2-user@ip-10-244-15-197 ~]$
 ```
 
-This is a full-fledged Linux system, albeit a little light on the installed packages. [^fn1]
+This is a full-fledged Linux system, albeit a little light on the installed packages. [^2]
 You can do all the things you'd expect to be able to do on a Linux system:
 
 ```shell
@@ -168,7 +168,7 @@ avoid surprises on your credit card bill later.
 
 First, if you're still logged into the instance, log out.
 
-Next, terminate the instance: [^fn2]
+Next, terminate the instance: [^3]
 
 ```shell
   $ ec2-terminate-instances i-fe56b891
@@ -188,13 +188,8 @@ Give it a minute or two, then double-check that the instance is no longer runnin
 At some point in the near future, this record will be garbage collected, and won't show
 up in `ec2-describe-instances` any more.
 
-[^fn1]: On purpose. Amazon's stated intention is to make a small, quick-booting Linux system,
-        and let you add on the stuff you need.
+[^1]: But it won't hurt if you do. You'll just get a warning to that effect.
 
-[^fn2]: S3-backed instances like this can only be terminated, which means that they will be
-        deleted after they shut down, and any data stored or changed in the instance will be
-        lost. EBS-backed instances can be stopped without terminating, which means they
-        remain known to EC2 and can be restarted again. I'll show an example of this in a
-        later post.
+[^2]: On purpose. Amazon's stated intention is to make a small, quick-booting Linux system, and let you add on the stuff you need.
 
-[^fn3]: But it won't hurt if you do. You'll just get a warning to that effect.
+[^3]: S3-backed instances like this can only be terminated, which means that they will be deleted after they shut down, and any data stored or changed in the instance will be lost. EBS-backed instances can be stopped without terminating, which means they remain known to EC2 and can be restarted again. I'll show an example of this in a later post.
