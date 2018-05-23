@@ -1,11 +1,12 @@
 @import "bootstrap/bootstrap";
+@import url("https://fonts.googleapis.com/css?family=Lato|Yanone+Kaffeesatz");
 
 // variables
 
 $background_color: #FFFFFF;
 $text_color: #221144;
-$header_color: #DDDDDD;
-$footer_color: #DDDDDD;
+$header_color: #EEEEEE;
+$footer_color: #EEEEEE;
 
 // mixins
 
@@ -33,7 +34,7 @@ body { @extend .container-fluid;
   padding: 0;
 
   > header {
-    background-color: $header_color;
+    border-bottom: 2px solid #DDDDDD;
     text-align: center;
 
     > h1 {
@@ -46,10 +47,12 @@ body { @extend .container-fluid;
   }
 
   > footer {
-    background-color: $footer_color;
+    border-top: 2px solid #DDDDDD;
     bottom: 0;
-    font-size: 12px;
+    font-family: "Yanone Kaffeesatz", sans-serif;
+    font-size: 16px;
     left: 0;
+    padding: 6px 0 2px;
     position: absolute;
     right: 0;
     text-align: center;
@@ -57,11 +60,15 @@ body { @extend .container-fluid;
 }
 
 
+.navbar {
+  padding: 0 16px;
+}
+
 .navbar-brand {
   border-bottom: none;
-  // font-family: "ligurino-condensed-1",  "ligurino-condensed-2", sans-serif;
+  font-family: "Yanone Kaffeesatz", sans-serif;
   font-size: 3em;
-  padding-top: 22px;
+  padding: 2px 0 0;
   position: relative;
   > img {
     // position: absolute;
@@ -77,26 +84,14 @@ body { @extend .container-fluid;
   }
 }
 
-// header {
-//   position: fixed;
-//   top: 0;
-//   z-index: 10;
-//   height: 121px;
-//   width: 100%;
-//   margin-bottom: 0;
-//   background: rgb(237, 237, 237) none;
-// }
 
-// footer {
-//   position: fixed;
-//   bottom: 0;
-//   z-index: 10;
-//   width: 100%;
-//   padding: 0.5em 0;
-//   background: rgb(237, 237, 237) none;
-// }
+.index-date {
+  font-family: "Yanone Kaffeesatz", sans-serif;
+}
 
-
+.index-title {
+  font-family: "Lato", sans-serif;
+}
 
 
 .black {
