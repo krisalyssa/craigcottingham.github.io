@@ -1,5 +1,4 @@
 ---
-layout: post
 title: Installing Phusion Passenger and nginx on Mac OS X
 categories:
 - ruby

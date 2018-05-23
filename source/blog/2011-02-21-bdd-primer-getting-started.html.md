@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Getting Started: A Behavior Driven Development Primer"
 updated: 2011-03-06T18:39:00-06:00
 categories:

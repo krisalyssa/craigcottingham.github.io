@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Initializing Amazon EC2 Instances with CloudInit"
 categories:
 - cloud
@@ -66,13 +65,13 @@ And here it is in action.
                 monitoring-disabled     50.17.64.120        10.207.103.252                \
                 instance-store          paravirtual xen
   $ ssh -i $EC2_KEYPAIR ec2-user@50.17.64.120
-  
+
   [ec2-user@domU-12-31-39-15-64-0E ~]$ pwd
   /home/ec2-user
   [ec2-user@domU-12-31-39-15-64-0E ~]$ ls -l
   total 4
   -rw-r--r-- 1 root root 6 Mar 20 04:22 user-script-output.txt
-  [ec2-user@domU-12-31-39-15-64-0E ~]$ cat user-script-output.txt 
+  [ec2-user@domU-12-31-39-15-64-0E ~]$ cat user-script-output.txt
   Woot!
 {% endhighlight %}
 
@@ -183,21 +182,21 @@ And here it is in action.
                 monitoring-disabled     184.73.11.176       10.114.46.188                 \
                 instance-store          paravirtual xen
   $ ssh -i $EC2_KEYPAIR ec2-user@184.73.11.176
-  
+
   [ec2-user@ip-10-114-46-188 ~]$ ls -l
   total 12
   -rw-r--r-- 1 root root 50 Mar 22 03:41 script-1-output.txt
   -rw-r--r-- 1 root root 46 Mar 22 03:41 script-2-output.txt
   -rw-r--r-- 1 root root 42 Mar 22 03:41 script-3-output.txt
-  [ec2-user@ip-10-114-46-188 ~]$ cat script-1-output.txt 
+  [ec2-user@ip-10-114-46-188 ~]$ cat script-1-output.txt
   running
   script-2 has not run
   script-3 has not run
-  [ec2-user@ip-10-114-46-188 ~]$ cat script-2-output.txt 
+  [ec2-user@ip-10-114-46-188 ~]$ cat script-2-output.txt
   running
   script-1 has run
   script-3 has not run
-  [ec2-user@ip-10-114-46-188 ~]$ cat script-3-output.txt 
+  [ec2-user@ip-10-114-46-188 ~]$ cat script-3-output.txt
   running
   script-1 has run
   script-2 has run

@@ -1,5 +1,4 @@
 ---
-layout: post
 title: Sometimes &ldquo;a cigar&rdquo; is not &ldquo;a cigar&rdquo;
 categories:
 - ruby

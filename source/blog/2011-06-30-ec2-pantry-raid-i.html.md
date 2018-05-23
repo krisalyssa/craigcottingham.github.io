@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "EC2 Pantry Raid I: Odds and Ends"
 categories:
 - cloud
@@ -51,7 +50,7 @@ First, you allocate a static IP address from AWS.
 
 {% highlight sh %}
   $ ec2-allocate-address
-  ADDRESS	50.17.204.89	
+  ADDRESS	50.17.204.89
 {% endhighlight %}
 
 As with EBS volumes, once you allocate an address, you start paying for it. The good news is,
@@ -64,9 +63,9 @@ you *don't* pay extra for it as long as it's associated with a running EC2 insta
                 ip-10-212-170-227.internal      running hrworx-keypair                  0 \
                 m1.small  2011-03-16T22:35:15+0000  us-east-1a  aki-407d9529              \
                 monitoring-disabled     50.17.140.20    10.212.170.227  ebs   paravirtual \
-                xen	
+                xen
   BLOCKDEVICE   /dev/sda1       vol-90a783f8    2011-03-16T22:35:39.000Z
-  
+
   $ ec2-associate-address 50.17.204.89 -i i-56857039
   ADDRESS	50.17.204.89	i-56857039
 
@@ -76,8 +75,8 @@ you *don't* pay extra for it as long as it's associated with a running EC2 insta
                 ip-10-212-170-227.internal      running hrworx-keypair                  0 \
                 m1.small  2011-03-16T22:35:15+0000  us-east-1a  aki-407d9529              \
                 monitoring-disabled     50.17.204.89    10.212.170.227  ebs   paravirtual \
-                xen	
-  BLOCKDEVICE	/dev/sda1	vol-90a783f8	2011-03-16T22:35:39.000Z	
+                xen
+  BLOCKDEVICE	/dev/sda1	vol-90a783f8	2011-03-16T22:35:39.000Z
 {% endhighlight %}
 
 Note that both the external IP address and the external name changed, to

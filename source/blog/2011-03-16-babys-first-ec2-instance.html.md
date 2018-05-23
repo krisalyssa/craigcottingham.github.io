@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Baby's First Amazon EC2 Instance"
 categories:
 - cloud

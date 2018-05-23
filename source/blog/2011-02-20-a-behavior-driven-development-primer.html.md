@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "A Behavior Driven Development Primer"
 categories:
 - bdd

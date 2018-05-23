@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Independence Day"
 categories:
 - administrivia

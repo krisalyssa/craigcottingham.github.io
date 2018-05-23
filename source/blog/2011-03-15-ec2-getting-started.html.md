@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Getting Started with Amazon EC2 (Superceded)"
 categories:
 - cloud

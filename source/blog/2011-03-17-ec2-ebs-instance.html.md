@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Persistent Servers with Amazon EC2 and EBS"
 categories:
 - cloud

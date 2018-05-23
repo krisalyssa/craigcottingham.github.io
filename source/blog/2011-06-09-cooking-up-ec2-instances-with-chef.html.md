@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "Cooking up EC2 Instances with Chef"
 categories:
 - chef
@@ -123,7 +122,7 @@ Obviously, the data supplied depends on the recipes; you'll need to check the do
       "recipe[git]",
       "recipe[postfix]"
     ],
-  
+
     "fqdn": "mynode.example.com",
     "servername": "mynode",
     "domain": "example.com",
@@ -133,7 +132,7 @@ Obviously, the data supplied depends on the recipes; you'll need to check the do
     "postfix": {
       "mail_type": "default"
     },
-  
+
     "rvm": {
       "version": "head",
       "track_updates": true,

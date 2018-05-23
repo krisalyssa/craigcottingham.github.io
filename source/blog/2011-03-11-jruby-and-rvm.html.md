@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "JRuby and RVM"
 categories:
 - jruby
@@ -42,17 +41,17 @@ Just as MacRuby is Ruby tied to Cocoa, so JRuby is Ruby tied to Java:
 {% highlight ruby %}
   $ irb
   jruby-1.5.6 :001 > include Java
-   => Object 
+   => Object
   jruby-1.5.6 :002 > StringBuffer = java.lang.StringBuffer
-   => Java::JavaLang::StringBuffer 
+   => Java::JavaLang::StringBuffer
   jruby-1.5.6 :003 > s = StringBuffer.new
-   => #<Java::JavaLang::StringBuffer:0x3fc66ec7> 
+   => #<Java::JavaLang::StringBuffer:0x3fc66ec7>
   jruby-1.5.6 :004 > s.append "Hello"
-   => #<Java::JavaLang::StringBuffer:0x3fc66ec7> 
+   => #<Java::JavaLang::StringBuffer:0x3fc66ec7>
   jruby-1.5.6 :005 > s.append " world!"
-   => #<Java::JavaLang::StringBuffer:0x3fc66ec7> 
+   => #<Java::JavaLang::StringBuffer:0x3fc66ec7>
   jruby-1.5.6 :006 > s.toString
-   => "Hello world!" 
+   => "Hello world!"
 {% endhighlight %}
 
 [^fn1]: JRuby 1.6.0, which should be out Any Day Now, is supposed to be fully compatible with

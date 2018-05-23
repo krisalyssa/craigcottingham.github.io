@@ -1,5 +1,4 @@
 ---
-layout: post
 title: "MacRuby and RVM"
 updated: 2011-03-11T19:47:00-06:00
 categories:
@@ -49,7 +48,7 @@ lets you install multiple Rubies on one system, keeping them separate, and allow
 to switch between them with a single command. Note that "Rubies" here means not only
 different versions of Ruby, but different flavors like MacRuby as well.
 
-The ins and outs of installing and setting up RVM are beyond the scope of this post. 
+The ins and outs of installing and setting up RVM are beyond the scope of this post.
 I'm going to assume you've already done so. Make sure you have an up-to-date install
 of RVM by running `rvm get head` followed by `rvm reload`; otherwise, you may not get
 the most recent version of MacRuby.
