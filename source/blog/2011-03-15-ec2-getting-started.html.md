@@ -50,11 +50,11 @@ AWS credentials.
 
 Add these variables to your environment, and make sure they're loaded into your shell:
 
-{% highlight sh %}
+```shell
   export EC2_HOME="$HOME/ec2"
   export EC2_PRIVATE_HOME="$HOME/.ec2"
   export PATH="$EC2_HOME/bin:$PATH"
-{% endhighlight %}
+```
 
 ### Set up AWS credentials
 
@@ -108,21 +108,21 @@ create a new one.
 
 Finally, create an SSH keypair like so:
 
-{% highlight sh %}
+```shell
   $ ec2-add-keypair ec2-keypair -O `cat $EC2_PRIVATE_HOME/aws-access-key` -W `cat $EC2_PRIVATE_HOME/aws-secret-access-key` > $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
   $ chmod 600 $EC2_PRIVATE_HOME/id_rsa-ec2-keypair
-{% endhighlight %}
+```
 
 ### Set up environment variables, part 2
 
 Add these variables to your environment, and make sure they're loaded into your shell:
 
-{% highlight sh %}
+```shell
   export EC2_CERT="$EC2_PRIVATE_HOME/cert-XXXXXXXX.pem"
   export EC2_PRIVATE_KEY="$EC2_PRIVATE_HOME/pk-XXXXXXXX.pem"
   export EC2_KEYPAIR="$EC2_PRIVATE_HOME/id_rsa-ec2-keypair"
   export EC2_KEYPAIR_NAME="ec2-keypair"
-{% endhighlight %}
+```
 
 ## A final note
 

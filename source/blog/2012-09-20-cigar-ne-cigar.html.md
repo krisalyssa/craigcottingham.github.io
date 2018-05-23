@@ -14,17 +14,17 @@ We start with a bare-bones Rails application, using Ruby 1.9.3-p194 and Rails 3.
 on Mac OS X 10.8.[^fn1] There&rsquo;s only one model, City, with a single attribute named
 `name`.
 
-{% highlight sh %}
+```shell
   $ rails new filesystem-backed-app
   $ cd filesystem-backed-app
   $ rails g scaffolding City name:string
   $ rake db:migrate
-{% endhighlight %}
+```
 
 We&rsquo;ll make one modification to the model class: when a new instance is created,
 a new directory will be created in `public/files` named with the value of `name`.[^fn2]
 
-{% highlight ruby %}
+```ruby
   require 'fileutils'
   include FileUtils
 
@@ -42,22 +42,22 @@ a new directory will be created in `public/files` named with the value of `name`
     end
 
   end
-{% endhighlight %}
+```
 
 Now, we can run the app, and add a few cities.
 
-{% highlight sh %}
+```shell
   $ rails s
-{% endhighlight %}
+```
 
 (Insert image of the cities new form here.)
 
 And when we look in `public/files`, we should see a directory for each city we added.
 
-{% highlight sh %}
+```shell
   $ ls public/files
   Barcelona  Düsseldorf  London  Paris
-{% endhighlight %}
+```
 
 So far, so good.
 
@@ -66,7 +66,7 @@ So far, so good.
 A useful feature would be to create folders in our common directory and tell the app
 to import them. It turns out it&rsquo;s easy to start adding.
 
-{% highlight ruby %}
+```ruby
   class CitiesController < ApplicationController
 
     def self.import
@@ -81,7 +81,7 @@ to import them. It turns out it&rsquo;s easy to start adding.
       end
     end
     ...
-{% endhighlight %}
+```
 
 Note that for now we&rsquo;re just printing out the name of each directory we find
 that isn&rsquo;t already in the database.
@@ -89,7 +89,7 @@ that isn&rsquo;t already in the database.
 To test it, create a directory in `public/files` and call the `import` method in the
 Rails console.
 
-{% highlight sh %}
+```shell
   $ mkdir -p public/files/Edinburgh
   $ rails console
   Loading development environment (Rails 3.2.8)
@@ -100,7 +100,7 @@ Rails console.
   "Edinburgh"
    => nil
   1.9.3p194 :003 >
-{% endhighlight %}
+```
 
 Wait -- what&rsquo;s Düsseldorf doing in this list?
 
@@ -114,14 +114,14 @@ non-ASCII character in its name.
 
 Then call the `import` method in the Rails console again.
 
-{% highlight sh %}
+```shell
   1.9.3p194 :003 > CitiesController.import
   "Düsseldorf"
   "Edinburgh"
   "Köln"
    => nil
   1.9.3p194 :004 >
-{% endhighlight %}
+```
 
 It looks like non-ASCII characters are at least part of the problem.
 
@@ -139,7 +139,7 @@ the string we&rsquo;re getting back from the filesystem so we can access it in t
 (We probably should remove the directories for Köln and Edinburgh first, so we&rsquo;re just
 looking at Düsseldorf.)
 
-{% highlight ruby %}
+```ruby
   cattr_accessor :bad_dirname
 
   def self.import
@@ -154,9 +154,9 @@ looking at Düsseldorf.)
       end
     end
   end
-{% endhighlight %}
+```
 
-{% highlight sh %}
+```shell
   1.9.3p194 :004 > CitiesController.import
   "Düsseldorf"
    => nil
@@ -173,7 +173,7 @@ looking at Düsseldorf.)
    => #<Encoding:UTF-8>
   1.9.3p194 :009 > from_filesystem == from_database
    => false
-{% endhighlight %}
+```
 
 Okay, so it&rsquo;s not the encoding. Both strings are UTF-8, and appear to have the same glyphs,
 but aren&rsquo;t binary equivalent.
@@ -196,14 +196,14 @@ normalization form, and returns the normalized string. According to the API docu
 preferred for interoperability, but as long as you normalize both strings you&rsquo;re comparing with the same
 normalization form, they should be comparable.
 
-{% highlight sh %}
+```shell
   1.9.3p194 :010 > from_filesystem = ActiveSupport::Multibyte::Unicode.normalize(from_filesystem, :kc)
    => "Düsseldorf"
   1.9.3p194 :011 > from_database = ActiveSupport::Multibyte::Unicode.normalize(from_database, :kc)
    => "Düsseldorf"
   1.9.3p194 :011 > from_filesystem == from_database
    => true
-{% endhighlight %}
+```
 
 ## So, what have we learned?
 

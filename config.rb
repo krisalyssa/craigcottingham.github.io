@@ -1,3 +1,6 @@
+set :markdown_engine, :redcarpet
+set :markdown, :fenced_code_blocks => true, :smartypants => true
+
 # Activate and configure extensions
 # https://middlemanapp.com/advanced/configuration/#configuring-extensions
 
@@ -31,6 +34,8 @@ activate :blog do | blog |
 end
 
 activate :livereload
+
+activate :syntax
 
 # Layouts
 # https://middlemanapp.com/basics/layouts/

@@ -37,9 +37,9 @@ Look up the identifier for the AMI you want to launch, from either
 is based on the American East Coast, I'm going to use `us-east`. Also, for this go-around,
 I'm going to use a 32-bit instance from Amazon that uses S3 as a backing store.
 
-{% highlight sh %}
+```shell
   $ ec2-run-instances --group default --key ec2-keypair ami-e8249881
-{% endhighlight %}
+```
 
 About the parameters and their values:
 
@@ -50,14 +50,14 @@ Open the firewall for SSH and ICMP connections. Note that these operations are o
 security group (`default` by, well, default); once you have done them once for your account,
 you shouldn't need to again. [^fn3]
 
-{% highlight sh %}
+```shell
   $ ec2-authorize default -P tcp -p 22 -s 0.0.0.0/0
   $ ec2-authorize default -P icmp -t -1:-1 -s 0.0.0.0/0
-{% endhighlight %}
+```
 
 Make sure that the instance is running:
 
-{% highlight sh %}
+```shell
   $ ec2-describe-instances
   RESERVATION   r-bc640bd1      331055354537    default
   INSTANCE      i-fe56b891      ami-d59d6bbc    ec2-50-17-139-123.compute-1.amazonaws.com \
@@ -83,7 +83,7 @@ Make sure that the instance is running:
   --- ec2-50-17-139-123.compute-1.amazonaws.com ping statistics ---
   3 packets transmitted, 3 packets received, 0.0% packet loss
   round-trip min/avg/max/stddev = 81.086/81.784/82.973/0.845 ms
- {% endhighlight %}
+ ```
 
 Note that your instance ID (`i-fe56b891`), DNS name (`ec2-50-17-139-123.compute-1.amazonaws.com`),
 and public IP address (`50.17.139.123`) will be different from mine, and the latter two will change
@@ -94,7 +94,7 @@ each time you start the instance. I'll cover how to get a persistent IP address 
 The Amazon Linux AMIs are preconfigured with a single user account named `ec2-user`. Since we
 opened up the SSH port, we can log in as this user:
 
-{% highlight sh %}
+```shell
   $ ssh -i $EC2_KEYPAIR ec2-user@50.17.139.123
   The authenticity of host '50.17.139.123 (50.17.139.123)' can't be established.
   RSA key fingerprint is dc:35:e8:86:fd:9f:63:2f:6a:cc:bc:d6:1d:6b:32:ee.
@@ -107,12 +107,12 @@ opened up the SSH port, we can log in as this user:
    
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
   [ec2-user@ip-10-244-15-197 ~]$
-{% endhighlight %}
+```
 
 This is a full-fledged Linux system, albeit a little light on the installed packages. [^fn1]
 You can do all the things you'd expect to be able to do on a Linux system:
 
-{% highlight sh %}
+```shell
   [ec2-user@ip-10-244-15-197 ~]$ yum check-update
   Loaded plugins: fastestmirror, security
   Skipping security plugin, no data
@@ -128,12 +128,12 @@ You can do all the things you'd expect to be able to do on a Linux system:
   [ec2-user@ip-10-244-15-197 ~]$ yum upgrade
   Loaded plugins: fastestmirror, security
   You need to be root to perform this command.
-{% endhighlight %}
+```
 
 ...except, apparently, the things requiring root privileges. Not a problem, as
 `ec2-user` has sudo privileges:
 
-{% highlight sh %}
+```shell
   [ec2-user@ip-10-244-15-197 ~]$ sudo yum upgrade
   Loaded plugins: fastestmirror, security
   Loading mirror speeds from cached hostfile
@@ -144,11 +144,11 @@ You can do all the things you'd expect to be able to do on a Linux system:
   Skipping security plugin, no data
   --> Running transaction check
   ...
-{% endhighlight %}
+```
 
 Finally, just to prove we have full access to the outside world:
 
-{% highlight sh %}
+```shell
   [ec2-user@ip-10-244-15-197 ~]$ ping craigcottingham.github.com
   PING craigcottingham.github.com (207.97.227.245) 56(84) bytes of data.
   64 bytes from pages.github.com (207.97.227.245): icmp_seq=1 ttl=51 time=2.72 ms
@@ -158,7 +158,7 @@ Finally, just to prove we have full access to the outside world:
   --- craigcottingham.github.com ping statistics ---
   3 packets transmitted, 3 received, 0% packet loss, time 2382ms
   rtt min/avg/max/mdev = 2.342/2.531/2.720/0.159 ms
-{% endhighlight %}
+```
 
 ## Don't forget to shut down
 
@@ -170,20 +170,20 @@ First, if you're still logged into the instance, log out.
 
 Next, terminate the instance: [^fn2]
 
-{% highlight sh %}
+```shell
   $ ec2-terminate-instances i-fe56b891
   INSTANCE  i-fe56b891  running shutting-down
-{% endhighlight %}
+```
 
 Give it a minute or two, then double-check that the instance is no longer running:
 
-{% highlight sh %}
+```shell
   $ ec2-describe-instances
   RESERVATION   r-bc640bd1      331055354537    default
   INSTANCE      i-fe56b891      ami-d59d6bbc    terminated      ec2-keypair             0 \
                 m1.small  2011-03-15T22:10:26+0000  us-east-1b  aki-407d9529              \
                 monitoring-disabled   instance-store            paravirtual xen
-{% endhighlight %}
+```
 
 At some point in the near future, this record will be garbage collected, and won't show
 up in `ec2-describe-instances` any more.

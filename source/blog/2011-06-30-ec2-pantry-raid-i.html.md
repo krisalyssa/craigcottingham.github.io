@@ -14,7 +14,7 @@ decided to lump them all together here.
 If you're running on Mac OS X, you can install the EC2 API command-line tools via
 [Homebrew](http://mxcl.github.com/homebrew/):
 
-{% highlight sh %}
+```shell
   $ brew install ec2-api-tools
   ==> Downloading http://ec2-downloads.s3.amazonaws.com/ec2-api-tools-1.4.2.2.zip
   ######################################################################## 100.0%
@@ -36,7 +36,7 @@ If you're running on Mac OS X, you can install the EC2 API command-line tools vi
   export EC2_PRIVATE_KEY="$(/bin/ls $HOME/.ec2/pk-*.pem)"
   export EC2_CERT="$(/bin/ls $HOME/.ec2/cert-*.pem)"
   export EC2_HOME="/usr/local/Cellar/ec2-api-tools/1.4.2.2/jars"
-{% endhighlight %}
+```
 
 ## Elastic IP addresses
 
@@ -48,15 +48,15 @@ same IP address every time. AWS gives us a way to do this, with elastic IP addre
 
 First, you allocate a static IP address from AWS.
 
-{% highlight sh %}
+```shell
   $ ec2-allocate-address
   ADDRESS	50.17.204.89
-{% endhighlight %}
+```
 
 As with EBS volumes, once you allocate an address, you start paying for it. The good news is,
 you *don't* pay extra for it as long as it's associated with a running EC2 instance.
 
-{% highlight sh %}
+```shell
   $ ec2-describe-instances
   RESERVATION   r-f2b7df9f      331055354537    default
   INSTANCE      i-56857039      ami-76f0061f    ec2-50-17-140-20.compute-1.amazonaws.com  \
@@ -77,7 +77,7 @@ you *don't* pay extra for it as long as it's associated with a running EC2 insta
                 monitoring-disabled     50.17.204.89    10.212.170.227  ebs   paravirtual \
                 xen
   BLOCKDEVICE	/dev/sda1	vol-90a783f8	2011-03-16T22:35:39.000Z
-{% endhighlight %}
+```
 
 Note that both the external IP address and the external name changed, to
 `50.17.204.89` and `ec2-50-17-204-89.compute-1.amazonaws.com` respectively.

@@ -57,30 +57,30 @@ the most recent version of MacRuby.
 
 You install MacRuby via RVM the same way you would any other Ruby:
 
-{% highlight sh %}
+```shell
   $ rvm install macruby
-{% endhighlight %}
+```
 
 RVM downloads MacRuby, runs its installer, then perform its usual magic to make which
 version of Ruby you're running transparent. In other words, MacRuby *is* your Ruby:
 
-{% highlight sh %}
+```shell
   $ rvm use macruby
   $ ruby -v
   MacRuby 0.9 (ruby 1.9.2) [universal-darwin10.0, x86_64]
-{% endhighlight %}
+```
 
 Okay, so MacRuby is your Ruby. But what about the Cocoa part?
 
 This is where MacRuby really shines -- `irb` gives you interactive access to Cocoa:
 
-{% highlight ruby %}
+```ruby
   $ irb
   irb(main):001:0> framework 'Cocoa'
   => true
   irb(main):002:0> NSSound.soundNamed('Submarine').play
   => true
-{% endhighlight %}
+```
 
 For maximum [Soviet sub captain with a Scottish accent](http://www.imdb.com/title/tt0099810/)
 goodness, turn your volume up first.

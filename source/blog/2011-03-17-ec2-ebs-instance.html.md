@@ -16,11 +16,11 @@ The procedure for creating an EBS-backed instance is pretty much the same as for
 a couple extra parameters you can pass when launching that make sense
 for EBS-backed instances.
 
-{% highlight sh %}
+```shell
   $ ec2-run-instances --group default --key ec2-keypair \
     --block-device-mapping "/dev/sda1=:16:false" --instance-initiated-shutdown-behavior stop \
     --disable-api-termination ami-1624987f
-{% endhighlight %}
+```
 
 About the parameters and their values:
 
@@ -37,7 +37,7 @@ About the parameters and their values:
 
 Make sure that the instance is running.
 
-{% highlight sh %}
+```shell
   $ ec2-describe-instances
   RESERVATION   r-0cb1d861      331055354537    default
   INSTANCE      i-b2719add      ami-76f0061f    ec2-50-17-77-114.compute-1.amazonaws.com  \
@@ -64,13 +64,13 @@ Make sure that the instance is running.
   --- ec2-50-17-77-114.compute-1.amazonaws.com ping statistics ---
   3 packets transmitted, 3 packets received, 0.0% packet loss
   round-trip min/avg/max/stddev = 80.967/81.241/81.439/0.200 ms
-{% endhighlight %}
+```
 
 ## Log in and look around
 
 Log in as `ec2-user`.
 
-{% highlight sh %}
+```shell
   $ ssh -i $EC2_KEYPAIR ec2-user@50.17.77.114
   The authenticity of host '50.17.77.114 (50.17.77.114)' can't be established.
   RSA key fingerprint is 0d:e2:46:64:b2:97:5c:48:1a:30:56:f2:9e:ca:b1:91.
@@ -83,16 +83,16 @@ Log in as `ec2-user`.
    
   See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
   [ec2-user@domU-12-31-39-00-DD-83 ~]$
-{% endhighlight %}
+```
 
 Let's have a look at the EBS volume that's being used for root.
 
-{% highlight sh %}
+```shell
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ df
   Filesystem           1K-blocks      Used Available Use% Mounted on
   /dev/xvda1             8256952    893748   7279320  11% /
   tmpfs                   859360         0    859360   0% /dev/shm
-{% endhighlight %}
+```
 
 That's not right -- 8,256,952 1K blocks adds up to roughly 8 GB, and nowhere near the 16 GB
 we specified when launching the instance.
@@ -102,7 +102,7 @@ apparently initializes the EBS volume from some internal snapshot which is 8 GB 
 Fortunately, it's easy to resize the filesystem to use all of the space on the volume that
 we allocated.
 
-{% highlight sh %}
+```shell
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ sudo resize2fs /dev/sda1
   resize2fs 1.41.12 (17-May-2010)
   Filesystem at /dev/sda1 is mounted on /; on-line resizing required
@@ -114,7 +114,7 @@ we allocated.
   Filesystem           1K-blocks      Used Available Use% Mounted on
   /dev/xvda1            16513960    897836  15448528   6% /
   tmpfs                   859360         0    859360   0% /dev/shm
-{% endhighlight %}
+```
 
 Much better.
 
@@ -123,37 +123,37 @@ Much better.
 Now, it would be good to prove to ourselves that the filesystem survives the instance being shutdown
 and restarted. Copy some text to a file in the `ec2-user`'s home directory. [^fn1]
 
-{% highlight sh %}
+```shell
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ echo 'Woot!' > persistent.txt
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ cat persistent.txt
   Woot!
-{% endhighlight %}
+```
 
 Shut down the instance from within itself (which we can safely do, because we specified that
 the instance should stop rather than terminate, when we launched it).
 
-{% highlight sh %}
+```shell
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ sudo shutdown -h now
    
   The system is going down for system halt NOW!DD-83 (pts/0) (Wed Mar 16 15:53:
   [ec2-user@domU-12-31-39-00-DD-83 ~]$ Connection to 50.17.77.114 closed by remote host.
   Connection to 50.17.77.114 closed.
-{% endhighlight %}
+```
 
 Check that the instance has actually shut down. [^fn2]
 
-{% highlight sh %}
+```shell
   $ ec2din
   RESERVATION   r-0cb1d861      331055354537    default
   INSTANCE      i-b2719add      ami-76f0061f    stopped         hrworx-keypair          0 \
                 m1.small  2011-03-16T15:22:45+0000  us-east-1a  aki-407d9529              \
                 monitoring-disabled     ebs         paravirtual xen
   BLOCKDEVICE	/dev/sda1	vol-5a745032	2011-03-16T15:54:10.000Z
-{% endhighlight %}
+```
 
 Restart the instance. Wait a minute for it to come up, then check to make sure that it's running.
 
-{% highlight sh %}
+```shell
   $ ec2start i-b2719add
   INSTANCE	i-b2719add	stopped	pending
   $ ec2din
@@ -164,12 +164,12 @@ Restart the instance. Wait a minute for it to come up, then check to make sure t
                 monitoring-disabled     50.16.85.142    10.210.79.35  ebs   paravirtual   \
                 xen
   BLOCKDEVICE   /dev/sda1       vol-5a745032    2011-03-16T19:28:59.000Z
-{% endhighlight %}
+```
 
 Note that the public IP address changed from the previous run.
 Log in, and go looking for the file that was stashed in `ec2-user`'s home directory.
 
-{% highlight sh %}
+```shell
   $ ssh -i $EC2_KEYPAIR ec2-user@50.16.85.142
   The authenticity of host '50.16.85.142 (50.16.85.142)' can't be established.
   RSA key fingerprint is 0d:e2:46:64:b2:97:5c:48:1a:30:56:f2:9e:ca:b1:91.
@@ -187,7 +187,7 @@ Log in, and go looking for the file that was stashed in `ec2-user`'s home direct
   -rw-rw-r-- 1 ec2-user ec2-user 6 Mar 16 15:51 persistent.txt
   [ec2-user@domU-12-31-39-09-48-D5 ~]$ cat persistent.txt
   Woot!
-{% endhighlight %}
+```
 
 Woot, indeed.
 
@@ -203,7 +203,7 @@ The comparable thing in the EC2 realm is to attach the volume to a running insta
 It appears in the instance as a disk device, which then can be mounted wherever you want
 in the filesystem.
 
-{% highlight sh %}
+```shell
   $ ec2-describe-volumes
   VOLUME  vol-006f4868  16  snap-cba692a1 us-east-1b  available 2011-03-17T01:53:49+0000
    
@@ -226,7 +226,7 @@ in the filesystem.
   -rw-rw-r-- 1 ec2-user ec2-user 6 Mar 17 01:58 persistence.txt
   [ec2-user@ip-10-196-37-162 ~]$ cat mnt/home/ec2-user/persistence.txt
   Woot!
-{% endhighlight %}
+```
 
 ## An important note
 
