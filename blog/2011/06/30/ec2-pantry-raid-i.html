@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>EC2 Pantry Raid I: Odds and Ends</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>This is a collection of tidbits I&rsquo;ve picked up as I&rsquo;ve worked through the last few posts
+about working with Amazon EC2. Nothing&rsquo;s big enough to deserve its own post, so I&rsquo;ve
+decided to lump them all together here.</p>
+
+<h2>Homebrew</h2>
+
+<p>If you&rsquo;re running on Mac OS X, you can install the EC2 API command-line tools via
+<a href="http://mxcl.github.com/homebrew/">Homebrew</a>:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>brew install ec2-api-tools
+  <span class="o">==&gt;</span> Downloading http://ec2-downloads.s3.amazonaws.com/ec2-api-tools-1.4.2.2.zip
+  <span class="c">######################################################################## 100.0%</span>
+  <span class="o">==&gt;</span> Caveats
+  Before you can use these tools you must <span class="nb">export </span>some variables to your <span class="nv">$SHELL</span>
+  and download your X.509 certificate and private key from Amazon Web Services.
+
+  Your certificate and private key are available at:
+  http://aws-portal.amazon.com/gp/aws/developer/account/index.html?action<span class="o">=</span>access-key
+
+  Download two <span class="s2">".pem"</span> files, one starting with <span class="sb">`</span>pk-<span class="sb">`</span>, and one starting with <span class="sb">`</span>cert-<span class="sb">`</span><span class="nb">.</span>
+  You need to put both into a folder <span class="k">in </span>your home directory, <span class="sb">`</span>~/.ec2<span class="sb">`</span><span class="nb">.</span>
+
+  To <span class="nb">export </span>the needed variables, add them to your dotfiles.
+   <span class="k">*</span> On Bash, add them to <span class="sb">`</span>~/.bash_profile<span class="sb">`</span><span class="nb">.</span>
+   <span class="k">*</span> On Zsh, add them to <span class="sb">`</span>~/.zprofile<span class="sb">`</span> instead.
+
+  <span class="nb">export </span><span class="nv">JAVA_HOME</span><span class="o">=</span><span class="s2">"/System/Library/Frameworks/JavaVM.framework/Home"</span>
+  <span class="nb">export </span><span class="nv">EC2_PRIVATE_KEY</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>/bin/ls <span class="nv">$HOME</span>/.ec2/pk-<span class="k">*</span>.pem<span class="k">)</span><span class="s2">"</span>
+  <span class="nb">export </span><span class="nv">EC2_CERT</span><span class="o">=</span><span class="s2">"</span><span class="k">$(</span>/bin/ls <span class="nv">$HOME</span>/.ec2/cert-<span class="k">*</span>.pem<span class="k">)</span><span class="s2">"</span>
+  <span class="nb">export </span><span class="nv">EC2_HOME</span><span class="o">=</span><span class="s2">"/usr/local/Cellar/ec2-api-tools/1.4.2.2/jars"</span>
+</code></pre></div>
+<h2>Elastic IP addresses</h2>
+
+<p>If you&rsquo;ve been <a href="/2011/03/17/ec2-ebs-instance.html">following along at home</a>, you probably
+noticed that when you start an EC2 instance it is assigned a new IP address by AWS.
+This isn&rsquo;t much of a problem for S3-backed instances, as they pretty much restart from scratch
+every time you start them, but for EBS-backed instances it would be handy if we could get the
+same IP address every time. AWS gives us a way to do this, with elastic IP addresses.</p>
+
+<p>First, you allocate a static IP address from AWS.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-allocate-address
+  ADDRESS   50.17.204.89
+</code></pre></div>
+<p>As with EBS volumes, once you allocate an address, you start paying for it. The good news is,
+you <em>don&rsquo;t</em> pay extra for it as long as it&rsquo;s associated with a running EC2 instance.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-describe-instances
+  RESERVATION   r-f2b7df9f      331055354537    default
+  INSTANCE      i-56857039      ami-76f0061f    ec2-50-17-140-20.compute-1.amazonaws.com  <span class="se">\</span>
+                ip-10-212-170-227.internal      running hrworx-keypair                  0 <span class="se">\</span>
+                m1.small  2011-03-16T22:35:15+0000  us-east-1a  aki-407d9529              <span class="se">\</span>
+                monitoring-disabled     50.17.140.20    10.212.170.227  ebs   paravirtual <span class="se">\</span>
+                xen
+  BLOCKDEVICE   /dev/sda1       vol-90a783f8    2011-03-16T22:35:39.000Z
+
+  <span class="nv">$ </span>ec2-associate-address 50.17.204.89 <span class="nt">-i</span> i-56857039
+  ADDRESS   50.17.204.89    i-56857039
+
+  <span class="nv">$ </span>ec2-describe-instances
+  RESERVATION   r-f2b7df9f      331055354537    default
+  INSTANCE      i-56857039      ami-76f0061f    ec2-50-17-204-89.compute-1.amazonaws.com  <span class="se">\</span>
+                ip-10-212-170-227.internal      running hrworx-keypair                  0 <span class="se">\</span>
+                m1.small  2011-03-16T22:35:15+0000  us-east-1a  aki-407d9529              <span class="se">\</span>
+                monitoring-disabled     50.17.204.89    10.212.170.227  ebs   paravirtual <span class="se">\</span>
+                xen
+  BLOCKDEVICE   /dev/sda1   vol-90a783f8    2011-03-16T22:35:39.000Z
+</code></pre></div>
+<p>Note that both the external IP address and the external name changed, to
+<code>50.17.204.89</code> and <code>ec2-50-17-204-89.compute-1.amazonaws.com</code> respectively.</p>
+
+<p>When the EC2 instance is stopped or terminated, the IP address is disassociated,
+and you can associate it with a different EC2 instance (or the same one, if you restart it).</p>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

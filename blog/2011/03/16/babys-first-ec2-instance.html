@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Baby's First Amazon EC2 Instance</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>Now that <a href="/2011/03/15/ec2-getting-started.html">Amazon EC2 has been set up</a>, it&rsquo;s time
+to create a server instance.</p>
+
+<h2>Choose an AMI</h2>
+
+<p>Amazon offers <a href="http://aws.amazon.com/amazon-linux-ami/">their own AMIs</a> in both 32- and 64-bit
+versions, each backed by either <a href="http://en.wikipedia.org/wiki/Amazon_S3">S3</a> or
+<a href="http://en.wikipedia.org/wiki/Amazon_Web_Services_Elastic_Block_Store">EBS</a>. They don&rsquo;t document
+what distribution they&rsquo;re based on, but the package management system is
+<a href="http://en.wikipedia.org/wiki/Yellowdog_Updater,_Modified">YUM</a>, which suggests Red Hat/Fedora
+or CentOS.</p>
+
+<p>Canonical publishes <a href="http://alestic.com/">AMIs</a> of various versions of their Ubuntu distribution,
+also in 32- and 64-bit versions and with different backing stores. As Ubuntu is derived from
+Debian, it uses <a href="http://en.wikipedia.org/wiki/Advanced_Packaging_Tool">APT</a> as its package
+management system.</p>
+
+<p>AMIs from both Amazon and Canonical are preloaded with support for CloudInit.</p>
+
+<p>YUM on the Amazon AMIs is configured to use an Amazon-specific package repository stored in
+S3; bandwidth used to access this repository doesn&rsquo;t count toward your charged limit. On the
+other hand, the version of neither the distribution used nor the Linux kernel running is
+documented, whereas with the Canonical AMIs it is.</p>
+
+<h2>Create a new instance</h2>
+
+<p>Look up the identifier for the AMI you want to launch, from either
+<a href="http://aws.amazon.com/amazon-linux-ami/">Amazon</a> or
+<a href="http://alestic.com/">Canonical</a>. Be sure to choose an appropriate region; as The Day Job
+is based on the American East Coast, I&rsquo;m going to use <code>us-east</code>. Also, for this go-around,
+I&rsquo;m going to use a 32-bit instance from Amazon that uses S3 as a backing store.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-run-instances <span class="nt">--group</span> default <span class="nt">--key</span> ec2-keypair ami-e8249881
+</code></pre></div>
+<p>About the parameters and their values:</p>
+
+<ul>
+<li>Replace <code>ec2-keypair</code> with the name of the keypair you generated in the initial setup,
+if necessary.</li>
+</ul>
+
+<p>Open the firewall for SSH and ICMP connections. Note that these operations are on a
+security group (<code>default</code> by, well, default); once you have done them once for your account,
+you shouldn&rsquo;t need to again. <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup></p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-authorize default <span class="nt">-P</span> tcp <span class="nt">-p</span> 22 <span class="nt">-s</span> 0.0.0.0/0
+  <span class="nv">$ </span>ec2-authorize default <span class="nt">-P</span> icmp <span class="nt">-t</span> <span class="nt">-1</span>:-1 <span class="nt">-s</span> 0.0.0.0/0
+</code></pre></div>
+<p>Make sure that the instance is running:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-describe-instances
+  RESERVATION   r-bc640bd1      331055354537    default
+  INSTANCE      i-fe56b891      ami-d59d6bbc    ec2-50-17-139-123.compute-1.amazonaws.com <span class="se">\</span>
+                ip-10-244-15-197.ec2.internal   running ec2-keypair             0         <span class="se">\</span>
+                m1.small  2011-03-15T22:10:26+0000  us-east-1b  aki-407d9529              <span class="se">\</span>
+                monitoring-disabled     50.17.139.123       10.244.15.197                 <span class="se">\</span>
+                instance-store          paravirtual xen
+  <span class="nv">$ </span>ping 50.17.139.123
+  PING 50.17.139.123 <span class="o">(</span>50.17.139.123<span class="o">)</span>: 56 data bytes
+  64 bytes from 50.17.139.123: <span class="nv">icmp_seq</span><span class="o">=</span>0 <span class="nv">ttl</span><span class="o">=</span>43 <span class="nb">time</span><span class="o">=</span>83.324 ms
+  64 bytes from 50.17.139.123: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>43 <span class="nb">time</span><span class="o">=</span>84.487 ms
+  64 bytes from 50.17.139.123: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>43 <span class="nb">time</span><span class="o">=</span>81.306 ms
+  ^C
+  <span class="nt">---</span> 50.17.139.123 ping statistics <span class="nt">---</span>
+  3 packets transmitted, 3 packets received, 0.0% packet loss
+  round-trip min/avg/max/stddev <span class="o">=</span> 81.306/83.039/84.487/1.314 ms
+  <span class="nv">$ </span>ping ec2-50-17-139-123.compute-1.amazonaws.com
+  PING ec2-50-17-139-123.compute-1.amazonaws.com <span class="o">(</span>50.17.139.123<span class="o">)</span>: 56 data bytes
+  64 bytes from 50.17.139.123: <span class="nv">icmp_seq</span><span class="o">=</span>0 <span class="nv">ttl</span><span class="o">=</span>43 <span class="nb">time</span><span class="o">=</span>82.973 ms
+  64 bytes from 50.17.139.123: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>43 <span class="nb">time</span><span class="o">=</span>81.292 ms
+  64 bytes from 50.17.139.123: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>43 <span class="nb">time</span><span class="o">=</span>81.086 ms
+  ^C
+  <span class="nt">---</span> ec2-50-17-139-123.compute-1.amazonaws.com ping statistics <span class="nt">---</span>
+  3 packets transmitted, 3 packets received, 0.0% packet loss
+  round-trip min/avg/max/stddev <span class="o">=</span> 81.086/81.784/82.973/0.845 ms
+</code></pre></div>
+<p>Note that your instance ID (<code>i-fe56b891</code>), DNS name (<code>ec2-50-17-139-123.compute-1.amazonaws.com</code>),
+and public IP address (<code>50.17.139.123</code>) will be different from mine, and the latter two will change
+each time you start the instance. I&rsquo;ll cover how to get a persistent IP address in a later post.</p>
+
+<h2>Log in and look around</h2>
+
+<p>The Amazon Linux AMIs are preconfigured with a single user account named <code>ec2-user</code>. Since we
+opened up the SSH port, we can log in as this user:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ssh <span class="nt">-i</span> <span class="nv">$EC2_KEYPAIR</span> ec2-user@50.17.139.123
+  The authenticity of host <span class="s1">'50.17.139.123 (50.17.139.123)'</span> can<span class="s1">'t be established.
+  RSA key fingerprint is dc:35:e8:86:fd:9f:63:2f:6a:cc:bc:d6:1d:6b:32:ee.
+  Are you sure you want to continue connecting (yes/no)? yes
+  Warning: Permanently added '</span>50.17.139.123<span class="s1">' (RSA) to the list of known hosts.
+   
+         __|  __|_  )  Amazon Linux AMI
+         _|  (     /     Beta
+        ___|\___|___|
+   
+  See /usr/share/doc/amzn-ami/image-release-notes for latest release notes. :-)
+  [ec2-user@ip-10-244-15-197 ~]$
+</span></code></pre></div>
+<p>This is a full-fledged Linux system, albeit a little light on the installed packages. <sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup>
+You can do all the things you&rsquo;d expect to be able to do on a Linux system:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="o">[</span>ec2-user@ip-10-244-15-197 ~]<span class="nv">$ </span>yum check-update
+  Loaded plugins: fastestmirror, security
+  Skipping security plugin, no data
+   
+  aws-amitools-ec2.noarch             1.3.57676-1.1.amzn1                     amzn
+  aws-apitools-as.noarch              1.0.33.1-1.1.amzn1                      amzn
+  aws-apitools-ec2.noarch             1.3.62308-1.1.amzn1                     amzn
+  aws-apitools-mon.noarch             1.0.9.5-1.1.amzn1                       amzn
+  aws-apitools-rds.noarch             1.3.003-1.1.amzn1                       amzn
+  cloud-init.noarch                   0.5.14-23.amzn1                         amzn
+  java-1.6.0-openjdk.i686             1:1.6.0.0-44.1.9.1.18.amzn1             amzn
+  system-release.noarch               2010.11-2                               amzn
+  <span class="o">[</span>ec2-user@ip-10-244-15-197 ~]<span class="nv">$ </span>yum upgrade
+  Loaded plugins: fastestmirror, security
+  You need to be root to perform this command.
+</code></pre></div>
+<p>&hellip;except, apparently, the things requiring root privileges. Not a problem, as
+<code>ec2-user</code> has sudo privileges:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="o">[</span>ec2-user@ip-10-244-15-197 ~]<span class="nv">$ </span><span class="nb">sudo </span>yum upgrade
+  Loaded plugins: fastestmirror, security
+  Loading mirror speeds from cached hostfile
+  amzn                                                     | 2.1 kB     00:00
+  Skipping security plugin, no data
+  Setting up Upgrade Process
+  Resolving Dependencies
+  Skipping security plugin, no data
+  <span class="nt">--</span><span class="o">&gt;</span> Running transaction check
+  ...
+</code></pre></div>
+<p>Finally, just to prove we have full access to the outside world:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="o">[</span>ec2-user@ip-10-244-15-197 ~]<span class="nv">$ </span>ping craigcottingham.github.com
+  PING craigcottingham.github.com <span class="o">(</span>207.97.227.245<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+  64 bytes from pages.github.com <span class="o">(</span>207.97.227.245<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>51 <span class="nb">time</span><span class="o">=</span>2.72 ms
+  64 bytes from pages.github.com <span class="o">(</span>207.97.227.245<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>51 <span class="nb">time</span><span class="o">=</span>2.34 ms
+  64 bytes from pages.github.com <span class="o">(</span>207.97.227.245<span class="o">)</span>: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>51 <span class="nb">time</span><span class="o">=</span>2.53 ms
+  ^C
+  <span class="nt">---</span> craigcottingham.github.com ping statistics <span class="nt">---</span>
+  3 packets transmitted, 3 received, 0% packet loss, <span class="nb">time </span>2382ms
+  rtt min/avg/max/mdev <span class="o">=</span> 2.342/2.531/2.720/0.159 ms
+</code></pre></div>
+<h2>Don&rsquo;t forget to shut down</h2>
+
+<p>As soon as the instance launches, you start racking up charges &ndash; granted, at the rate of
+USD0.085 per hour, more or less. Shut the instance down when you&rsquo;re done with it, to
+avoid surprises on your credit card bill later.</p>
+
+<p>First, if you&rsquo;re still logged into the instance, log out.</p>
+
+<p>Next, terminate the instance: <sup id="fnref3"><a href="#fn3" rel="footnote">3</a></sup></p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-terminate-instances i-fe56b891
+  INSTANCE  i-fe56b891  running shutting-down
+</code></pre></div>
+<p>Give it a minute or two, then double-check that the instance is no longer running:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-describe-instances
+  RESERVATION   r-bc640bd1      331055354537    default
+  INSTANCE      i-fe56b891      ami-d59d6bbc    terminated      ec2-keypair             0 <span class="se">\</span>
+                m1.small  2011-03-15T22:10:26+0000  us-east-1b  aki-407d9529              <span class="se">\</span>
+                monitoring-disabled   instance-store            paravirtual xen
+</code></pre></div>
+<p>At some point in the near future, this record will be garbage collected, and won&rsquo;t show
+up in <code>ec2-describe-instances</code> any more.</p>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>But it won&rsquo;t hurt if you do. You&rsquo;ll just get a warning to that effect.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>On purpose. Amazon&rsquo;s stated intention is to make a small, quick-booting Linux system, and let you add on the stuff you need.&nbsp;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn3">
+<p>S3-backed instances like this can only be terminated, which means that they will be deleted after they shut down, and any data stored or changed in the instance will be lost. EBS-backed instances can be stopped without terminating, which means they remain known to EC2 and can be restarted again. I&rsquo;ll show an example of this in a later post.&nbsp;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

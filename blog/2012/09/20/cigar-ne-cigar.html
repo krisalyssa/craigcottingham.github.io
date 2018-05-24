@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Sometimes "a cigar" is not "a cigar"</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>I ran across odd behavior the other day while playing with a simple Rails app.
+Tracking down why it was behaving the way it was led me down an interesting rabbit hole.
+This is what I found on the way back out.</p>
+
+<h2>A simple filesystem-backed app</h2>
+
+<p>We start with a bare-bones Rails application, using Ruby 1.9.3-p194 and Rails 3.2.8
+on Mac OS X 10.8. <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup> There&rsquo;s only one model, City, with a single attribute named
+<code>name</code>.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>rails new filesystem-backed-app
+  <span class="nv">$ </span><span class="nb">cd </span>filesystem-backed-app
+  <span class="nv">$ </span>rails g scaffolding City name:string
+  <span class="nv">$ </span>rake db:migrate
+</code></pre></div>
+<p>We&rsquo;ll make one modification to the model class: when a new instance is created,
+a new directory will be created in <code>public/files</code> named with the value of <code>name</code>. <sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup></p>
+<div class="highlight"><pre class="highlight ruby"><code>  <span class="nb">require</span> <span class="s1">'fileutils'</span>
+  <span class="kp">include</span> <span class="no">FileUtils</span>
+
+  <span class="k">class</span> <span class="nc">City</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+    <span class="n">after_commit</span> <span class="ss">:create_folder</span>
+
+    <span class="n">attr_accessible</span> <span class="ss">:name</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">folder_root</span>
+      <span class="no">File</span><span class="p">.</span><span class="nf">expand_path</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="no">Rails</span><span class="p">.</span><span class="nf">root</span><span class="p">,</span> <span class="s1">'public'</span><span class="p">,</span> <span class="s1">'files'</span><span class="p">))</span>
+    <span class="k">end</span>
+
+    <span class="k">def</span> <span class="nf">create_folder</span>
+      <span class="n">mkdir_p</span> <span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="no">City</span><span class="p">.</span><span class="nf">folder_root</span><span class="p">,</span> <span class="nb">self</span><span class="p">.</span><span class="nf">name</span><span class="p">)</span>
+    <span class="k">end</span>
+
+  <span class="k">end</span>
+</code></pre></div>
+<p>Now, we can run the app, and add a few cities.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>rails s
+</code></pre></div>
+<p>(Insert image of the cities new form here.)</p>
+
+<p>And when we look in <code>public/files</code>, we should see a directory for each city we added.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span><span class="nb">ls </span>public/files
+  Barcelona  Düsseldorf  London  Paris
+</code></pre></div>
+<p>So far, so good.</p>
+
+<h2>Bulk importing new records</h2>
+
+<p>A useful feature would be to create folders in our common directory and tell the app
+to import them. It turns out it&rsquo;s easy to start adding.</p>
+<div class="highlight"><pre class="highlight ruby"><code>  <span class="k">class</span> <span class="nc">CitiesController</span> <span class="o">&lt;</span> <span class="no">ApplicationController</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">import</span>
+      <span class="no">Dir</span><span class="p">.</span><span class="nf">glob</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="no">City</span><span class="p">.</span><span class="nf">folder_root</span><span class="p">,</span> <span class="s1">'*'</span><span class="p">))</span> <span class="k">do</span> <span class="o">|</span> <span class="n">f</span> <span class="o">|</span>
+        <span class="k">if</span> <span class="no">File</span><span class="p">.</span><span class="nf">directory?</span> <span class="n">f</span>
+          <span class="n">from_filesystem</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">basename</span> <span class="n">f</span>
+          <span class="n">found</span> <span class="o">=</span> <span class="no">City</span><span class="p">.</span><span class="nf">find_by_name</span><span class="p">(</span><span class="n">from_filesystem</span><span class="p">)</span>
+          <span class="k">if</span> <span class="n">found</span><span class="p">.</span><span class="nf">nil?</span>
+            <span class="nb">p</span> <span class="n">from_filesystem</span>
+          <span class="k">end</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+    <span class="o">...</span>
+</code></pre></div>
+<p>Note that for now we&rsquo;re just printing out the name of each directory we find
+that isn&rsquo;t already in the database.</p>
+
+<p>To test it, create a directory in <code>public/files</code> and call the <code>import</code> method in the
+Rails console.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>mkdir <span class="nt">-p</span> public/files/Edinburgh
+  <span class="nv">$ </span>rails console
+  Loading development environment <span class="o">(</span>Rails 3.2.8<span class="o">)</span>
+  1.9.3p194 :001 <span class="o">&gt;</span> ActiveRecord::Base.logger <span class="o">=</span> nil
+   <span class="o">=&gt;</span> nil
+  1.9.3p194 :002 <span class="o">&gt;</span> CitiesController.import
+  <span class="s2">"Düsseldorf"</span>
+  <span class="s2">"Edinburgh"</span>
+   <span class="o">=&gt;</span> nil
+  1.9.3p194 :003 <span class="o">&gt;</span>
+</code></pre></div>
+<p>Wait &ndash; what&rsquo;s Düsseldorf doing in this list?</p>
+
+<h2>Narrowing down the problem space</h2>
+
+<p>One way Düsseldorf stands out is that it&rsquo;s the only city name with a non-ASCII character
+in it. To see if that&rsquo;s relevant, create another city through the browser UI with a
+non-ASCII character in its name.</p>
+
+<p>(Insert image of the cities new form here.)</p>
+
+<p>Then call the <code>import</code> method in the Rails console again.</p>
+<div class="highlight"><pre class="highlight shell"><code>  1.9.3p194 :003 <span class="o">&gt;</span> CitiesController.import
+  <span class="s2">"Düsseldorf"</span>
+  <span class="s2">"Edinburgh"</span>
+  <span class="s2">"Köln"</span>
+   <span class="o">=&gt;</span> nil
+  1.9.3p194 :004 <span class="o">&gt;</span>
+</code></pre></div>
+<p>It looks like non-ASCII characters are at least part of the problem.</p>
+
+<h2>Non-ASCII characters&hellip; that reminds me of something</h2>
+
+<p>Specifically, <a href="http://blog.grayproductions.net/articles/what_is_a_character_encoding">encodings</a>.</p>
+
+<p>James Edward Gray II does a much better job of explaining encodings than I can, and so
+I can&rsquo;t recommend his blog posts on the topic enough. Suffice it to say that two strings
+may appear to be identical when presented on the screen, but if their encodings are
+different they won&rsquo;t necessarily be equivalent in Ruby.</p>
+
+<p><code>String#encoding</code> will report the encoding for a string. First, though, we have to stash
+the string we&rsquo;re getting back from the filesystem so we can access it in the console.
+(We probably should remove the directories for Köln and Edinburgh first, so we&rsquo;re just
+looking at Düsseldorf.)</p>
+<div class="highlight"><pre class="highlight ruby"><code>  <span class="n">cattr_accessor</span> <span class="ss">:bad_dirname</span>
+
+  <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">import</span>
+    <span class="no">Dir</span><span class="p">.</span><span class="nf">glob</span><span class="p">(</span><span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="no">City</span><span class="p">.</span><span class="nf">folder_root</span><span class="p">,</span> <span class="s1">'*'</span><span class="p">))</span> <span class="k">do</span> <span class="o">|</span> <span class="n">f</span> <span class="o">|</span>
+      <span class="k">if</span> <span class="no">File</span><span class="p">.</span><span class="nf">directory?</span> <span class="n">f</span>
+        <span class="n">from_filesystem</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">basename</span> <span class="n">f</span>
+        <span class="n">from_database</span> <span class="o">=</span> <span class="no">City</span><span class="p">.</span><span class="nf">find_by_name</span><span class="p">(</span><span class="n">from_filesystem</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">from_database</span><span class="p">.</span><span class="nf">nil?</span>
+          <span class="nb">self</span><span class="p">.</span><span class="nf">bad_dirname</span> <span class="o">=</span> <span class="n">from_filesystem</span>
+          <span class="nb">p</span> <span class="n">from_filesystem</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div><div class="highlight"><pre class="highlight shell"><code>  1.9.3p194 :004 <span class="o">&gt;</span> CitiesController.import
+  <span class="s2">"Düsseldorf"</span>
+   <span class="o">=&gt;</span> nil
+  1.9.3p194 :005 <span class="o">&gt;</span> p CitiesController.bad_dirname
+  <span class="s2">"Düsseldorf"</span>
+   <span class="o">=&gt;</span> <span class="s2">"Düsseldorf"</span>
+  1.9.3p194 :006 <span class="o">&gt;</span> from_filesystem <span class="o">=</span> CitiesController.bad_dirname
+   <span class="o">=&gt;</span> <span class="s2">"Düsseldorf"</span>
+  1.9.3p194 :007 <span class="o">&gt;</span> from_filesystem.encoding
+   <span class="o">=&gt;</span> <span class="c">#&lt;Encoding:UTF-8&gt;</span>
+  1.9.3p194 :007 <span class="o">&gt;</span> from_database <span class="o">=</span> City.where<span class="o">(</span><span class="s2">"name like 'D%'"</span><span class="o">)</span>.first.name
+   <span class="o">=&gt;</span> <span class="s2">"Düsseldorf"</span>
+  1.9.3p194 :008 <span class="o">&gt;</span> from_database.encoding
+   <span class="o">=&gt;</span> <span class="c">#&lt;Encoding:UTF-8&gt;</span>
+  1.9.3p194 :009 <span class="o">&gt;</span> from_filesystem <span class="o">==</span> from_database
+   <span class="o">=&gt;</span> <span class="nb">false</span>
+</code></pre></div>
+<p>Okay, so it&rsquo;s not the encoding. Both strings are UTF-8, and appear to have the same glyphs,
+but aren&rsquo;t binary equivalent.</p>
+
+<h2>And now the title of this post makes more sense</h2>
+
+<p>After some judicious (and lucky) searching, I found this statement on the Unicode web site:</p>
+
+<blockquote>
+<p>For round-trip compatibility with existing standards, Unicode has encoded many entities that are really variants of the same abstract character. <sup id="fnref3"><a href="#fn3" rel="footnote">3</a></sup></p>
+</blockquote>
+
+<p>In other words, there can be more than one binary representation for a given string.</p>
+
+<p>Fortunately, Unicode includes rules for <em>normalization</em>&mdash;transforming a string into a canonical representation.
+After normalization, two strings with the same glyphs should be binary equivalent.</p>
+
+<p>Rather than try to roll our own normalization code, we can use the
+<a href="http://api.rubyonrails.org/classes/ActiveSupport/Multibyte/Unicode.html">ActiveSupport::Multibyte::Unicode</a>
+module, which was added to Rails 3.0. The <code>normalize</code> function takes a string and a symbol representing a
+normalization form, and returns the normalized string. According to the API documentation, the <code>:kc</code> form is
+preferred for interoperability, but as long as you normalize both strings you&rsquo;re comparing with the same
+normalization form, they should be comparable.</p>
+<div class="highlight"><pre class="highlight shell"><code>  1.9.3p194 :010 <span class="o">&gt;</span> from_filesystem <span class="o">=</span> ActiveSupport::Multibyte::Unicode.normalize<span class="o">(</span>from_filesystem, :kc<span class="o">)</span>
+   <span class="o">=&gt;</span> <span class="s2">"Düsseldorf"</span>
+  1.9.3p194 :011 <span class="o">&gt;</span> from_database <span class="o">=</span> ActiveSupport::Multibyte::Unicode.normalize<span class="o">(</span>from_database, :kc<span class="o">)</span>
+   <span class="o">=&gt;</span> <span class="s2">"Düsseldorf"</span>
+  1.9.3p194 :011 <span class="o">&gt;</span> from_filesystem <span class="o">==</span> from_database
+   <span class="o">=&gt;</span> <span class="nb">true</span>
+</code></pre></div>
+<h2>So, what have we learned?</h2>
+
+<ol>
+<li>Unicode is not always Unicode. Two strings which look the same to a person viewing them may not look the
+same to your code.</li>
+<li>If you&rsquo;re taking string from disparate sources, like a database, a filesystem, and/or a web browser, you
+may need to normalize one or more of them for them to be binary equivalent.</li>
+</ol>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>I don&rsquo;t know how much of this is relevant to the coming tale. Ruby 1.9 probably is, as is some flavor of OS X. Rails will be used in the solution. All this will be explained later.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>Think iTunes &ndash; metadata in a database, with binary large objects stored on the filesystem.&nbsp;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn3">
+<p><a href="http://www.unicode.org/reports/tr15/tr15-29.html#Introduction">http://www.unicode.org/reports/tr15/tr15-29.html#Introduction</a>&nbsp;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

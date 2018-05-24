@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>MacRuby and RVM</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>Mac OS X, being a modern operating system, has a rich development environment in Cocoa.
+Based on Objective-C, a highly-object-oriented language blending C <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup> and Smalltalk,
+Cocoa provides an extensive class hierarchy not only for the user interface, but nearly
+the entire operating system. Better yet, the development community has made available
+lots of third-party code, enabling you to make your Cocoa apps that much better.</p>
+
+<p>Mac OS X, being a Unix-flavored operating system, has many dynamic scripting languages
+available. My favorite these days is Ruby, a fully-object-oriented language blending
+Perl, Smalltalk, and others. The syntax is expressive without being cryptic, and the
+built-in library is extensive. Better yet, the extent of third-party code available is
+nearly as broad as one could hope for. Ruby has been used for code as small as simple
+command line utilities, and as large as full e-commerce websites, using frameworks like
+Rails.</p>
+
+<p>Objective-C has at its fingertips the whole of the Mac OS X UI and operating system,
+but it&rsquo;s a compiled language, which makes exploring and prototyping slow and sometimes
+cumbersome. Ruby is interpreted <sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup>, which makes it fast in which to develop, but
+being written with broad platform support in mind, it doesn&rsquo;t have direct access to the
+rich Cocoa environment.</p>
+
+<p>If only there were a way to get the best of both worlds&hellip;.</p>
+
+<h2>You got your Ruby in my Cocoa!</h2>
+
+<p>Enter <a href="http://www.macruby.org/">MacRuby</a>. Simply put, it&rsquo;s a Ruby environment written
+in Objective-C which exposes the whole of Cocoa to the scripts it runs. Now, hacking
+Cocoa is as simple as firing up <code>irb</code>.</p>
+
+<p>Mac OS X ships with a conventional Ruby install, so MacRuby is designed to live along
+side it without disturbing it. Out of the box, the various MacRuby binaries (<code>ruby</code>,
+<code>irb</code>, etc.) are installed with a <code>mac</code> prefix (<code>macruby</code>, <code>macirb</code>, etc.), which leads
+to confusion when you run the conventional Ruby by mistake.</p>
+
+<p>If only there were a way to have both installed, and switch between them&hellip;.</p>
+
+<h2>You got your Cocoa in my Ruby! Wait, no, you didn&rsquo;t</h2>
+
+<p>Enter <a href="http://rvm.beginrescueend.com/">RVM</a>, the Ruby Version Manager. Simply put, it
+lets you install multiple Rubies on one system, keeping them separate, and allows you
+to switch between them with a single command. Note that &ldquo;Rubies&rdquo; here means not only
+different versions of Ruby, but different flavors like MacRuby as well.</p>
+
+<p>The ins and outs of installing and setting up RVM are beyond the scope of this post.
+I&rsquo;m going to assume you&rsquo;ve already done so. Make sure you have an up-to-date install
+of RVM by running <code>rvm get head</code> followed by <code>rvm reload</code>; otherwise, you may not get
+the most recent version of MacRuby.</p>
+
+<h2>You put the Cocoa in the Ruby and you drink it all up</h2>
+
+<p>You install MacRuby via RVM the same way you would any other Ruby:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>rvm install macruby
+</code></pre></div>
+<p>RVM downloads MacRuby, runs its installer, then perform its usual magic to make which
+version of Ruby you&rsquo;re running transparent. In other words, MacRuby <em>is</em> your Ruby:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>rvm use macruby
+  <span class="nv">$ </span>ruby <span class="nt">-v</span>
+  MacRuby 0.9 <span class="o">(</span>ruby 1.9.2<span class="o">)</span> <span class="o">[</span>universal-darwin10.0, x86_64]
+</code></pre></div>
+<p>Okay, so MacRuby is your Ruby. But what about the Cocoa part?</p>
+
+<p>This is where MacRuby really shines &ndash; <code>irb</code> gives you interactive access to Cocoa:</p>
+<div class="highlight"><pre class="highlight ruby"><code>  <span class="err">$</span> <span class="n">irb</span>
+  <span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">001</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="n">framework</span> <span class="s1">'Cocoa'</span>
+  <span class="o">=&gt;</span> <span class="kp">true</span>
+  <span class="n">irb</span><span class="p">(</span><span class="n">main</span><span class="p">):</span><span class="mo">002</span><span class="p">:</span><span class="mi">0</span><span class="o">&gt;</span> <span class="no">NSSound</span><span class="p">.</span><span class="nf">soundNamed</span><span class="p">(</span><span class="s1">'Submarine'</span><span class="p">).</span><span class="nf">play</span>
+  <span class="o">=&gt;</span> <span class="kp">true</span>
+</code></pre></div>
+<p>For maximum <a href="http://www.imdb.com/title/tt0099810/">Soviet sub captain with a Scottish accent</a>
+goodness, turn your volume up first.</p>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>Once described as &ldquo;combining the power of assembly language with the complexity of assembly language&rdquo;.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>Not entirely, but the distinction is beyond the scope of this post.&nbsp;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

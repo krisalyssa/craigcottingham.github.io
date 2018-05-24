@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Cooking up EC2 Instances with Chef</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <div class="ed-note">Updated 2011-06-26: Fixed the description of the internal layout of `cookbooks.tar.gz`.</div>
+
+<p>In <a href="/2011/03/21/ec2-and-cloudinit.html">my last blog post about EC2</a>, I closed by mentioning that
+CloudInit has a 16K limit on user data, into which it can be difficult to shoehorn complex server
+configurations. One way around that is a configuration management tool; I&rsquo;ll look at one called
+<a href="http://www.opscode.com/chef/">Chef</a>.</p>
+
+<h2><em>Mise en place</em></h2>
+
+<p>Chef is a software package that runs <em>recipes</em> describing actions to perform (creating or editing
+files, downloading data, etc.), applying <em>attributes</em> as necessary for per-instance configuration
+(such as differences between staging and production servers). Normally, recipes and other data
+are staged to a central configuration server (either Opscode&rsquo;s or one you host yourself), but for
+simplicity&rsquo;s sake I&rsquo;m going to use Chef Solo, which doesn&rsquo;t use a central server but assumes that
+all the necessary files are local. <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup></p>
+
+<p>In the discussion below, <em>node</em> refers to a computer on which Chef Solo is being run. In most cases,
+it will probably be a server, but I suppose Opscode chose to use a different term to avoid confusion
+between the Chef server and a Chef client, the latter of which runs on the node.</p>
+
+<h2>Menu</h2>
+
+<p>There are three pieces to a Chef Solo implementation, besides Chef itself.</p>
+
+<ol>
+<li>A script which configures <code>chef-solo</code>; for the purposes of this document, I&rsquo;ll be calling it
+<code>config.rb</code>.</li>
+<li>A tarball containing the recipes and roles to use; for the purposes of this document, I&rsquo;ll be
+calling it <code>cookbooks.tar.gz</code>.</li>
+<li>A JSON fragment containing the attributes configuring the node; for the purposes of this document,
+I&rsquo;ll be calling it <code>mynode.json</code>.</li>
+</ol>
+
+<p>Examples of each of these three are presented below, and can also be downloaded from this web site.</p>
+
+<h3>First course: <code>config.rb</code> <a href="/code/chef/config.rb">(download)</a></h3>
+
+<p>The configuration file specifies where Chef Solo puts its working files, and other runtime options like
+logging. Chef provides a DSL, which simplifies the syntax. There are two required attributes:</p>
+
+<ul>
+<li><code>file_cache_path</code> should be an absolute path. Chef Solo will store working files here.</li>
+<li><code>cookbook_path</code> should be an absolute path, and should be a subdirectory of <code>file_cache_path</code>.
+It can optionally be an array of paths, but for Chef Solo (and more specifically the way we&rsquo;re
+using it here) that will probably not be useful.</li>
+</ul>
+
+<p>Not required but very useful is <code>recipe_url</code>. This is a URL pointing to the cookbooks tarball
+(described in more detail below). You can pass this URL to <code>chef-solo</code> when you run it, but I use
+the same tarball for all of our servers, and I like to minimize typing where possible. <sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup></p>
+
+<p>A full list of attributes can be seen at <a href="http://wiki.opscode.com/display/chef/Chef+Configuration+Settings">http://wiki.opscode.com/display/chef/Chef+Configuration+Settings</a>.
+However, note that not all of those attributes are used by Chef Solo.</p>
+<div class="highlight"><pre class="highlight ruby"><code>  <span class="n">file_cache_path</span>  <span class="s2">"/var/chef"</span>
+  <span class="n">cookbook_path</span>    <span class="s2">"/var/chef/cookbooks"</span>
+  <span class="n">recipe_url</span>       <span class="s2">"https://s3.amazonaws.com/craigcottingham-blog/chef/cookbooks.tar.gz"</span>
+  <span class="n">log_level</span>        <span class="ss">:info</span>
+  <span class="n">log_location</span>     <span class="s2">"/var/log/chef.log"</span>  <span class="c1"># or STDOUT</span>
+  <span class="n">verbose_logging</span>  <span class="kp">true</span>
+</code></pre></div>
+<h3>Second course: <code>cookbooks.tar.gz</code> <a href="/code/chef/cookbooks.tar.gz">(download)</a></h3>
+
+<p>The cookbooks tarball contains the recipes <sup id="fnref3"><a href="#fn3" rel="footnote">3</a></sup> that Chef Solo will reference when running.
+This is something that you have to build yourself; think of it as your personal playlist of
+cookbooks selected from all the cookbooks out there. At a minimum, the tarball should have an
+internal layout something like:</p>
+<div class="highlight"><pre class="highlight shell"><code>  cookbooks/
+    build-essential/
+      ...
+    git
+      ...
+    rvm
+      ...
+</code></pre></div>
+<p>If you include roles, they should be in a directory named <code>roles</code> at the top level, as a sibling of
+<code>cookbooks</code>.</p>
+
+<p>Premade cookbooks can be found in a number of places.</p>
+
+<ul>
+<li>The canonical source is <a href="http://community.opscode.com/cookbooks">http://community.opscode.com/cookbooks</a>. Unfortunately, the documentation
+for each cookbook is thin at best; often, you need to download the cookbook and read the contents
+to determine whether it will do what you&rsquo;re looking for and, if so, how to use it.</li>
+<li>Opscode&rsquo;s own Git repository for Chef cookbooks is at <a href="https://github.com/opscode/cookbooks">https://github.com/opscode/cookbooks</a>.</li>
+<li>A third party, <a href="https://github.com/cookbooks">https://github.com/cookbooks</a>, splits the cookbooks out into individual repositories,
+and collects community contributions.</li>
+<li>I have a number of cookbooks in my Git repository at <a href="https://github.com/CraigCottingham">https://github.com/CraigCottingham</a>. Most of them
+are forks of the <code>cookbooks</code> repositories with topic branches, but there&rsquo;s some new stuff in there
+as well.</li>
+</ul>
+
+<h3>Third course: <code>mynode.json</code> <a href="/code/chef/mynode.json">(download)</a></h3>
+
+<p>The first two parts of Chef Solo can be common to all nodes configured by Chef, and in fact that&rsquo;s how
+I use it. The third part is where you give attributes specific to a single node.</p>
+
+<p>The good news is that it&rsquo;s a JSON fragment, so it&rsquo;s a standard data format which you&rsquo;re likely to already
+be familiar with. The bad news is that it&rsquo;s a JSON fragment, which means that&rsquo;s it&rsquo;s extremely sensitive
+to bad syntax (like dangling commas) and you aren&rsquo;t allowed to comment in-line.</p>
+
+<p>The most important part of the JSON fragment is the <code>run_list</code> value. This tells Chef Solo what recipes <sup id="fnref4"><a href="#fn4" rel="footnote">4</a></sup>
+to use to configure the node. The remainder of the JSON fragment supplies data used by the recipes.
+Obviously, the data supplied depends on the recipes; you&rsquo;ll need to check the documentation.</p>
+<div class="highlight"><pre class="highlight javascript"><code>  <span class="p">{</span>
+    <span class="s2">"run_list"</span><span class="p">:</span> <span class="p">[</span>
+      <span class="s2">"recipe[build-essential]"</span><span class="p">,</span>
+      <span class="s2">"recipe[hostname]"</span><span class="p">,</span>
+      <span class="s2">"recipe[hosts]"</span><span class="p">,</span>
+      <span class="s2">"recipe[timezone]"</span><span class="p">,</span>
+      <span class="s2">"recipe[networking_basic]"</span><span class="p">,</span>
+      <span class="s2">"recipe[rvm]"</span><span class="p">,</span>
+      <span class="s2">"recipe[git]"</span><span class="p">,</span>
+      <span class="s2">"recipe[postfix]"</span>
+    <span class="p">],</span>
+
+    <span class="s2">"fqdn"</span><span class="p">:</span> <span class="s2">"mynode.example.com"</span><span class="p">,</span>
+    <span class="s2">"servername"</span><span class="p">:</span> <span class="s2">"mynode"</span><span class="p">,</span>
+    <span class="s2">"domain"</span><span class="p">:</span> <span class="s2">"example.com"</span><span class="p">,</span>
+    <span class="s2">"ip_address"</span><span class="p">:</span> <span class="s2">"127.0.0.1"</span><span class="p">,</span>
+    <span class="s2">"timezone"</span><span class="p">:</span> <span class="s2">"US/Central"</span><span class="p">,</span>
+
+    <span class="s2">"postfix"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">"mail_type"</span><span class="p">:</span> <span class="s2">"default"</span>
+    <span class="p">},</span>
+
+    <span class="s2">"rvm"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"head"</span><span class="p">,</span>
+      <span class="s2">"track_updates"</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+      <span class="s2">"ruby"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"version"</span><span class="p">:</span> <span class="s2">"1.9.2"</span><span class="p">,</span>
+        <span class="s2">"default"</span><span class="p">:</span> <span class="kc">true</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</code></pre></div>
+<p>Recipes should list other recipes they depend on in their metadata, so the order of recipes in the
+run list should not be significant. I&rsquo;m not sure how much to trust the declared dependencies, so
+I list recipes in the order in which I want them run.</p>
+
+<h2><em>Allez cuisine!</em></h2>
+
+<p>Now that we have all the parts, let&rsquo;s put them together.</p>
+
+<p>Remember that we&rsquo;re using CloudInit to initialize our Amazon EC2 instance. The easiest way to do this
+in my experience is to write a shell script that sets up and runs Chef, and have CloudInit run it.
+There&rsquo;s a fair amount that needs to go in this script, but it&rsquo;s well under the 16K limit, and
+only one thing that needs to change for any given node.</p>
+
+<p>First, upload your cookbooks tarball, the configuration script, and the JSON fragment to some place
+reachable by a freshly-started EC2 instance; Amazon S3 is as good a place as any.</p>
+
+<p>Second, create a shell script something like the following and save it locally. You can upload it to
+the same place as the other files for safekeeping, but it needs to be readable <em>as a file</em> by the
+<code>ec2run</code> command. (If you want, you can <a href="/code/chef/mynode.sh">download</a> it from this web site.)</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="c">#!/bin/sh</span>
+
+  <span class="c"># start EC2 instance with</span>
+  <span class="c"># $ ec2run ami-8c1fece5 --instance-type t1.micro --group sg-XXXXXX --key $EC2_KEYPAIR_NAME \</span>
+  <span class="c">#          -f mynode.sh</span>
+  <span class="c"># followed by:</span>
+  <span class="c"># $ ec2addtag i-XXXXXXXX --tag Name=mynode</span>
+
+  <span class="c"># update system software</span>
+  yum <span class="nt">-y</span> upgrade
+  yum <span class="nt">-y</span> install gcc make ruby ruby-devel ruby-libs rubygems
+
+  <span class="c"># update RubyGems</span>
+  gem update <span class="nt">--system</span>
+
+  <span class="c"># install Chef</span>
+  gem install chef ohai <span class="nt">--no-rdoc</span> <span class="nt">--no-ri</span>
+
+  mkdir <span class="nt">-p</span> /etc/chef
+
+  <span class="c"># get Chef Solo configuration</span>
+  curl <span class="nt">-o</span> /etc/chef/solo.rb https://s3.amazonaws.com/craigcottingham-blog/chef/config.rb
+
+  <span class="c"># run Chef</span>
+  chef-solo <span class="nt">-c</span> /etc/chef/config.rb <span class="se">\</span>
+            <span class="nt">-j</span> https://s3.amazonaws.com/craigcottingham-blog/chef/mynode.json
+</code></pre></div>
+<p>Finally, create the new EC2 instance, passing the name of the shell script with the <code>-f</code> parameter.</p>
+
+<p>The commands to update Yum and Rubygems aren&rsquo;t strictly necessary, but I like knowing that when
+Chef runs, it has access to the most recent distribution packages and Ruby gems.</p>
+
+<h2>Don&rsquo;t forget to tip your server</h2>
+
+<p>So, what happened?</p>
+
+<p>When Chef Solo is invoked, it loads the configuration script (specified by the <code>-c</code> parameter), then
+downloads the cookbooks tarball to <code>file_cache_path</code> and expands it into <code>cookbook_path</code>. Then it
+downloads the JSON fragment (specified by the <code>-j</code> parameter), parses it, and begins executing the
+run list. By the time it finishes, you have a fully-configured node.</p>
+
+<p>Since my nodes run in Amazon EC2, it&rsquo;s impossible to tell when Chef Solo has finished running. I have
+cobbled together a little Ruby script which sends me an instant message via Jabber on completion; I&rsquo;ll
+clean that up and elaborate more in a future blog post.</p>
+
+<h2>Acknowledgements</h2>
+
+<p>Many thanks to Fabio Akita for
+<a href="http://akitaonrails.com/2010/02/20/cooking-solo-with-chef">Cooking Solo with Chef</a>, which pointed me
+in the right direction for jumping headlong in to Chef.</p>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>Which sounds like we&rsquo;re going to run into the 16K limit again. Bear with me.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>Not that you&rsquo;d know it from reading this blog. Unless you look at the posting frequency.&nbsp;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn3">
+<p>And roles, which I&rsquo;ll talk about in a future post.&nbsp;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn4">
+<p>See footnote 3.&nbsp;<a href="#fnref4" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

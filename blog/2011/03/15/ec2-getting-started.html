@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Getting Started with Amazon EC2 (Superceded)</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <blockquote>
+<p>Note: This article has been replaced by <a href="/2016/08/22/ec2-getting-started-ii.html">an updated version</a>.</p>
+</blockquote>
+
+<p>At The Day Job, we&rsquo;ve started moving some of our development processes to
+<a href="http://aws.amazon.com/ec2/">Amazon EC2</a>. Occasionally, we need to radically increase the
+processing power available for continuous integration, unit testing, and user acceptance
+testing, but don&rsquo;t want to incur the cost of all that horsepower when we don&rsquo;t need it.
+Cloud-based solutions like EC2 <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup> are a good fit for this kind of on-demand usage.</p>
+
+<p>Until recently, I haven&rsquo;t seen documentation or tutorials of the right scope and flavor
+to get me to dive in and learn how to set up the virtual instances we need. I was under the
+impression that I needed to create a custom <a href="http://en.wikipedia.org/wiki/Amazon_Machine_Image">AMI</a>
+loaded with the software we needed to run &ndash; a process that appeared dense and convoluted.
+My perception was changed by three very important pieces of information:</p>
+
+<ol>
+<li>An <a href="http://blog.restbackup.com/how-to-use-amazon-ec2-as-your-desktop">article by Michael Leonhard</a>
+on setting up and using an Amazon EC2 instance as a &ldquo;desktop&rdquo; machine, which led me to</li>
+<li>The discovery that Amazon and Canonical (the publishers of the Ubuntu Linux distribution)
+offer bare Linux AMIs, configured like fresh installs on new hardware, which led me to</li>
+<li>Ubuntu&rsquo;s <a href="http://help.ubuntu.com/community/CloudInit">CloudInit</a>, a process for initializing
+and configuring a freshly-launched AMI instance</li>
+</ol>
+
+<p>So, that&rsquo;s what I&rsquo;ve been looking for: a well-defined starting point, and a documented, repeatable
+way of configuring a new instance. Now I&rsquo;m ready to dive in.</p>
+
+<h2>One-time setup</h2>
+
+<p>Michael Leonhard&rsquo;s article (linked above) does a great job of walking you through setting
+up your local computer for working with Amazon EC2, if you&rsquo;re running Windows. For those of us
+running Mac OS X or another Unix-like operating system, here&rsquo;s what you need to do.</p>
+
+<h3>Download the EC2 command line tools</h3>
+
+<p>Amazon provides a decent GUI interface to their web services, but it&rsquo;s a Flash application.
+Also, I&rsquo;m intending to automate the process of starting and stopping servers eventually,
+so learning to use the command line tools seems the smart thing to do.</p>
+
+<p>They can be downloaded from <a href="http://aws.amazon.com/developertools/351">http://aws.amazon.com/developertools/351</a>. After unpacking it,
+move the contents of the topmost folder to <code>~/ec2</code>.
+While you&rsquo;re at it, create a folder at <code>~/.ec2</code> (note the period) in which to store the
+AWS credentials.</p>
+
+<h3>Set up environment variables, part 1</h3>
+
+<p>Add these variables to your environment, and make sure they&rsquo;re loaded into your shell:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nb">export </span><span class="nv">EC2_HOME</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/ec2"</span>
+  <span class="nb">export </span><span class="nv">EC2_PRIVATE_HOME</span><span class="o">=</span><span class="s2">"</span><span class="nv">$HOME</span><span class="s2">/.ec2"</span>
+  <span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="nv">$EC2_HOME</span><span class="s2">/bin:</span><span class="nv">$PATH</span><span class="s2">"</span>
+</code></pre></div>
+<h3>Set up AWS credentials</h3>
+
+<p>You have to have an AWS account, and have signed up for EC2.</p>
+
+<p>Go to <a href="http://aws.amazon.com/account/">http://aws.amazon.com/account/</a> and click on the link that reads &ldquo;Security Credentials&rdquo;.
+Log into your AWS account when prompted. Scroll down to &ldquo;Access Credentials&rdquo;.</p>
+
+<h4>Access Keys</h4>
+
+<p>The command line tools access AWS through a web service, which requires access keys.</p>
+
+<p>Click on the tab that reads &ldquo;Access Keys&rdquo;, then on &ldquo;Create a new Access Key&rdquo;. After a moment,
+you should see a new entry under &ldquo;Your Access Keys&rdquo;.</p>
+
+<div markdown="1" class="screenshot">
+![Screenshot of AWS Access Credentials, Access Key][aws_access_key]
+</div>
+
+<p>Copy the string under &ldquo;Access Key ID&rdquo; and save it to a file in the directory pointed to by
+the <code>EC2_PRIVATE_HOME</code> environment variable (for instance, <code>aws-access-key</code>).</p>
+
+<p>You&rsquo;ll also need to save the secret access key, so click on &ldquo;Show&rdquo; next to the access key ID.</p>
+
+<div markdown="1" class="screenshot">
+![Screenshot of AWS Access Credentials, Secret Access Key][aws_secret_access_key]
+</div>
+
+<p>Copy this string and save it to a different file in <code>EC2_PRIVATE_HOME</code> (for instance,
+<code>aws-secret-access-key</code>).</p>
+
+<h4>X.509 Certificates</h4>
+
+<p>Next, click on the tab that reads &ldquo;X.509 Certificates&rdquo;.</p>
+
+<div markdown="1" class="screenshot">
+![Screenshot of AWS Access Credentials, X.509 Certificates][aws_credentials_x509]
+</div>
+
+<p>Click on &ldquo;Create a new Certificate&rdquo;. After a moment, you&rsquo;ll get a dialog box containing buttons
+with which you can download your newly-created private key and certificate. Click on each
+button in turn, and download the files to the directory named <code>EC2_PRIVATE_HOME</code>.</p>
+
+<div markdown="1" class="screenshot">
+![Screenshot of AWS X.509 Certificate download][aws_x509_created]
+</div>
+
+<p><strong>Very important:</strong> Amazon does not store your private key, so you can&rsquo;t download it again later.
+If you forget to download it, or lose it later, you&rsquo;ll have to deactivate this certificate and
+create a new one.</p>
+
+<p>Finally, create an SSH keypair like so:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-add-keypair ec2-keypair <span class="nt">-O</span> <span class="sb">`</span><span class="nb">cat</span> <span class="nv">$EC2_PRIVATE_HOME</span>/aws-access-key<span class="sb">`</span> <span class="nt">-W</span> <span class="sb">`</span><span class="nb">cat</span> <span class="nv">$EC2_PRIVATE_HOME</span>/aws-secret-access-key<span class="sb">`</span> <span class="o">&gt;</span> <span class="nv">$EC2_PRIVATE_HOME</span>/id_rsa-ec2-keypair
+  <span class="nv">$ </span>chmod 600 <span class="nv">$EC2_PRIVATE_HOME</span>/id_rsa-ec2-keypair
+</code></pre></div>
+<h3>Set up environment variables, part 2</h3>
+
+<p>Add these variables to your environment, and make sure they&rsquo;re loaded into your shell:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nb">export </span><span class="nv">EC2_CERT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$EC2_PRIVATE_HOME</span><span class="s2">/cert-XXXXXXXX.pem"</span>
+  <span class="nb">export </span><span class="nv">EC2_PRIVATE_KEY</span><span class="o">=</span><span class="s2">"</span><span class="nv">$EC2_PRIVATE_HOME</span><span class="s2">/pk-XXXXXXXX.pem"</span>
+  <span class="nb">export </span><span class="nv">EC2_KEYPAIR</span><span class="o">=</span><span class="s2">"</span><span class="nv">$EC2_PRIVATE_HOME</span><span class="s2">/id_rsa-ec2-keypair"</span>
+  <span class="nb">export </span><span class="nv">EC2_KEYPAIR_NAME</span><span class="o">=</span><span class="s2">"ec2-keypair"</span>
+</code></pre></div>
+<h2>A final note</h2>
+
+<p>The command-line EC2 tools use Java, so make sure you have set up your Java environment
+correctly.</p>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>Note that I&rsquo;m not endorsing EC2 over other solutions like <a href="http://www.rackspace.com/cloud/">Rackspace Cloud</a>, at least not yet. EC2 is just what I&rsquo;m working with at the moment.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Blog Name</title>
+  <subtitle>Blog subtitle</subtitle>
+  <id>http://blog.url.com/blog</id>
+  <link href="http://blog.url.com/blog"/>
+  <link href="http://blog.url.com/feed.xml" rel="self"/>
+  <updated>2016-08-21T19:00:00-05:00</updated>
+  <author>
+    <name>Blog Author</name>
+  </author>
+  <entry>
+    <title>Getting Started with Amazon EC2</title>
+    <link rel="alternate" href="http://blog.url.com/blog/2016/08/22/ec2-getting-started-ii.html"/>
+    <id>http://blog.url.com/blog/2016/08/22/ec2-getting-started-ii.html</id>
+    <published>2016-08-21T19:00:00-05:00</published>
+    <updated>2018-05-23T10:58:21-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;blockquote&gt;
+&lt;p&gt;Note: This is an update of an article &lt;a href="/2011/03/15/ec2-getting-started.html"&gt;originally posted on 2011-03-15&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;At The Day Job, we&amp;rsquo;ve started moving some of our server infrastructure to
+&lt;a href="http://aws.amazon.com/ec2/"&gt;Amazon EC2&lt;/a&gt;. Occasionally, we need to radically increase the
+processing power available for continuous integration, unit testing, and user acceptance
+testing, but don&amp;rsquo;t want to incur the cost of all that horsepower when we don&amp;rsquo;t need it.
+Cloud-based solutions like EC2 &lt;sup id="fnref1"&gt;&lt;a href="#fn1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt; are a good fit for this kind of on-demand usage.&lt;/p&gt;
+
+&lt;h2&gt;One-time setup&lt;/h2&gt;
+
+&lt;p&gt;There are a few things you&amp;rsquo;ll need to do once before we can get our hands dirty.&lt;/p&gt;
+
+&lt;h3&gt;Install the AWS command line tools&lt;/h3&gt;
+
+&lt;p&gt;Amazon provides a nice GUI interface to their web services, but I&amp;rsquo;m intending to automate the process of
+starting and stopping servers eventually, so learning to use the command line tools seems the smart thing to do.&lt;/p&gt;
+
+&lt;p&gt;Rather than go into the steps to install and set up the command line tools, I&amp;rsquo;m going to refer you to
+Amazon&amp;rsquo;s own documentation at http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html .&lt;/p&gt;
+
+&lt;h3&gt;A note about regions&lt;/h3&gt;
+
+&lt;p&gt;Amazon operates a number of data centers around the world. Most times you refer to some kind of resource in AWS,
+you&amp;rsquo;ll need to specify &lt;em&gt;which&lt;/em&gt; data center it&amp;rsquo;s in. When you configured the AWS command line tools,
+one of the options was for your default region; if you didn&amp;rsquo;t provide a value, it defaults to &lt;code&gt;us-east-1&lt;/code&gt;.
+Note that unless you explicitly specify a different region, that&amp;rsquo;s where everything you create from here on out will be created.&lt;/p&gt;
+
+&lt;h3&gt;Create a security group&lt;/h3&gt;
+
+&lt;p&gt;I could (and probably should) write a whole article about security practices when using AWS. For now,
+we&amp;rsquo;re going to initialize a security group to use in further examples without going into too much detail.&lt;/p&gt;
+
+&lt;p&gt;First, create the security group.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;aws ec2 create-security-group &lt;span class="nt"&gt;--group-name&lt;/span&gt; demo-sg &lt;span class="nt"&gt;--description&lt;/span&gt; &lt;span class="s2"&gt;"For demonstration purposes"&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;You can name it something other than &lt;code&gt;demo-sg&lt;/code&gt; if you desire, but make sure to use the new name from here on out.&lt;/p&gt;
+
+&lt;p&gt;We&amp;rsquo;ll want to use SSH to log in to the instances we boot, so we need to enable traffic through the default SSH port.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;aws ec2 authorize-security-group-ingress &lt;span class="nt"&gt;--group-name&lt;/span&gt; demo-sg &lt;span class="nt"&gt;--protocol&lt;/span&gt; tcp &lt;span class="nt"&gt;--port&lt;/span&gt; 22 &lt;span class="nt"&gt;--cidr&lt;/span&gt; 0.0.0.0/0
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;For added security, we could restrict logins to only those from a single IP address or a range of IP addresses.
+Here, we&amp;rsquo;re allowing logins from any IP address, which should be fine for our purposes.&lt;/p&gt;
+
+&lt;h3&gt;Create an SSH key pair&lt;/h3&gt;
+
+&lt;p&gt;Instead of having to remember passwords for each EC2 instance, which should be both complex and unique,
+we&amp;rsquo;ll set up an SSH key pair, half of which will remain private and local to your local computer.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;aws ec2 create-key-pair &lt;span class="nt"&gt;--key-name&lt;/span&gt; demo-keypair &lt;span class="nt"&gt;--query&lt;/span&gt; &lt;span class="s1"&gt;'KeyMaterial'&lt;/span&gt; &lt;span class="nt"&gt;--output&lt;/span&gt; text &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; ~/.ssh/demo-keypair.pem
+  &lt;span class="nv"&gt;$ &lt;/span&gt;chmod 400 ~/.ssh/demo-keypair.pem
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;As with the security group, you can name it otherwise, but be sure to change the following examples as appropriate.&lt;/p&gt;
+
+&lt;h2&gt;Cowabunga!&lt;/h2&gt;
+
+&lt;p&gt;The following posts in this series will assume that these steps have already been taken.&lt;/p&gt;
+
+&lt;div class="footnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+
+&lt;li id="fn1"&gt;
+&lt;p&gt;Note that I&amp;rsquo;m not endorsing EC2 over other solutions like &lt;a href="http://www.rackspace.com/cloud/"&gt;Rackspace Cloud&lt;/a&gt;, at least not yet. EC2 is just what I&amp;rsquo;m working with at the moment.&amp;nbsp;&lt;a href="#fnref1" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Updated Posts</title>
+    <link rel="alternate" href="http://blog.url.com/blog/2013/01/20/updates.html"/>
+    <id>http://blog.url.com/blog/2013/01/20/updates.html</id>
+    <published>2013-01-19T18:00:00-06:00</published>
+    <updated>2018-05-22T23:38:22-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;Thanks to a question from a reader &lt;sup id="fnref1"&gt;&lt;a href="#fn1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt;, I revisited the posts about creating EC2 instances on Amazon AWS:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href="http://craigcottingham.github.com/2011/03/15/ec2-getting-started.html"&gt;Getting Started with Amazon EC2&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://craigcottingham.github.com/2011/03/16/babys-first-ec2-instance.html"&gt;Baby&amp;rsquo;s First Amazon EC2 Instance&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href="http://craigcottingham.github.com/2011/03/17/ec2-ebs-instance.html"&gt;Persistent Servers with Amazon EC2 and EBS&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Fortunately, they didn&amp;rsquo;t need too much updating. The procedure for setting up your AWS and EC2 credentials
+seems to have changed a little, and I also updated the AMI references to more recent 64 bit images.&lt;/p&gt;
+
+&lt;div class="footnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+
+&lt;li id="fn1"&gt;
+&lt;p&gt;Probably the only one, and I&amp;rsquo;m pretty sure he found me through Google.&amp;nbsp;&lt;a href="#fnref1" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Installing Phusion Passenger and nginx on Mac OS X</title>
+    <link rel="alternate" href="http://blog.url.com/blog/2013/01/09/installing-passenger-and-nginx.html"/>
+    <id>http://blog.url.com/blog/2013/01/09/installing-passenger-and-nginx.html</id>
+    <published>2013-01-08T18:00:00-06:00</published>
+    <updated>2018-05-23T07:59:51-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I was trying to install &lt;a href="https://www.phusionpassenger.com"&gt;Phusion Passenger&lt;/a&gt; and &lt;a href="http://nginx.org"&gt;nginx&lt;/a&gt;
+on Mac OS X 10.8.2, using the Passenger installer for nginx, and kept running into this error:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;passenger-install-nginx-module
+  ...
+  Undefined symbols &lt;span class="k"&gt;for &lt;/span&gt;architecture x86_64:
+    &lt;span class="s2"&gt;"_pcre_free_study"&lt;/span&gt;, referenced from:
+        _ngx_pcre_free_studies &lt;span class="k"&gt;in &lt;/span&gt;ngx_regex.o
+  ld: symbol&lt;span class="o"&gt;(&lt;/span&gt;s&lt;span class="o"&gt;)&lt;/span&gt; not found &lt;span class="k"&gt;for &lt;/span&gt;architecture x86_64
+  collect2: ld returned 1 &lt;span class="nb"&gt;exit &lt;/span&gt;status
+  make[1]: &lt;span class="k"&gt;***&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;objs/nginx] Error 1
+  make: &lt;span class="k"&gt;***&lt;/span&gt; &lt;span class="o"&gt;[&lt;/span&gt;build] Error 2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The Googles turned up &lt;a href="http://blog.phusion.nl/2012/10/26/fixing-nginx-pcre-compilation-issues-on-os-x-2/"&gt;a blog post from Phusion&lt;/a&gt;
+about what appeared to be the same problem. Applying their suggested fix (downloading &lt;code&gt;pcre.h&lt;/code&gt; and copying it to &lt;code&gt;/usr/include&lt;/code&gt;)
+didn&amp;rsquo;t help, unfortunately.&lt;/p&gt;
+
+&lt;p&gt;I happened to stumble across &lt;a href="https://github.com/agentzh/ngx_openresty/issues/3"&gt;a Github issue about a different nginx module&lt;/a&gt;
+that provided a tantalizing hint:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;If the problem persists, please check that if you have multiple versions of PCRE installed in your system.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;There was a version of pcre installed via Homebrew already on my system. I had apparently installed it for something I had since
+uninstalled, because I was able to remove it without complaint. Running the Passenger installer for nginx this time was more
+successful:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;passenger-install-nginx-module
+  ...
+  PCRE &lt;span class="o"&gt;(&lt;/span&gt;required by Nginx&lt;span class="o"&gt;)&lt;/span&gt; not installed, downloading it...
+  ...
+  Nginx with Passenger support was successfully installed.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It looks like pcre installed via Homebrew confuses the Passenger installer; removing pcre allows the installer to download
+all the pieces it needs to a place it can find them.&lt;/p&gt;
+
+&lt;p&gt;Now, to see how it runs.&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>Sometimes "a cigar" is not "a cigar"</title>
+    <link rel="alternate" href="http://blog.url.com/blog/2012/09/20/cigar-ne-cigar.html"/>
+    <id>http://blog.url.com/blog/2012/09/20/cigar-ne-cigar.html</id>
+    <published>2012-09-19T19:00:00-05:00</published>
+    <updated>2018-05-23T09:40:32-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I ran across odd behavior the other day while playing with a simple Rails app.
+Tracking down why it was behaving the way it was led me down an interesting rabbit hole.
+This is what I found on the way back out.&lt;/p&gt;
+
+&lt;h2&gt;A simple filesystem-backed app&lt;/h2&gt;
+
+&lt;p&gt;We start with a bare-bones Rails application, using Ruby 1.9.3-p194 and Rails 3.2.8
+on Mac OS X 10.8. &lt;sup id="fnref1"&gt;&lt;a href="#fn1" rel="footnote"&gt;1&lt;/a&gt;&lt;/sup&gt; There&amp;rsquo;s only one model, City, with a single attribute named
+&lt;code&gt;name&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;rails new filesystem-backed-app
+  &lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;cd &lt;/span&gt;filesystem-backed-app
+  &lt;span class="nv"&gt;$ &lt;/span&gt;rails g scaffolding City name:string
+  &lt;span class="nv"&gt;$ &lt;/span&gt;rake db:migrate
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;We&amp;rsquo;ll make one modification to the model class: when a new instance is created,
+a new directory will be created in &lt;code&gt;public/files&lt;/code&gt; named with the value of &lt;code&gt;name&lt;/code&gt;. &lt;sup id="fnref2"&gt;&lt;a href="#fn2" rel="footnote"&gt;2&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;  &lt;span class="nb"&gt;require&lt;/span&gt; &lt;span class="s1"&gt;'fileutils'&lt;/span&gt;
+  &lt;span class="kp"&gt;include&lt;/span&gt; &lt;span class="no"&gt;FileUtils&lt;/span&gt;
+
+  &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;City&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;ActiveRecord&lt;/span&gt;&lt;span class="o"&gt;::&lt;/span&gt;&lt;span class="no"&gt;Base&lt;/span&gt;
+    &lt;span class="n"&gt;after_commit&lt;/span&gt; &lt;span class="ss"&gt;:create_folder&lt;/span&gt;
+
+    &lt;span class="n"&gt;attr_accessible&lt;/span&gt; &lt;span class="ss"&gt;:name&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;folder_root&lt;/span&gt;
+      &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;expand_path&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;Rails&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;root&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'public'&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'files'&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nf"&gt;create_folder&lt;/span&gt;
+      &lt;span class="n"&gt;mkdir_p&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;City&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;folder_root&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nb"&gt;self&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now, we can run the app, and add a few cities.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;rails s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;(Insert image of the cities new form here.)&lt;/p&gt;
+
+&lt;p&gt;And when we look in &lt;code&gt;public/files&lt;/code&gt;, we should see a directory for each city we added.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;&lt;span class="nb"&gt;ls &lt;/span&gt;public/files
+  Barcelona  Düsseldorf  London  Paris
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;So far, so good.&lt;/p&gt;
+
+&lt;h2&gt;Bulk importing new records&lt;/h2&gt;
+
+&lt;p&gt;A useful feature would be to create folders in our common directory and tell the app
+to import them. It turns out it&amp;rsquo;s easy to start adding.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;  &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;CitiesController&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="no"&gt;ApplicationController&lt;/span&gt;
+
+    &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;import&lt;/span&gt;
+      &lt;span class="no"&gt;Dir&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;glob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;City&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;folder_root&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'*'&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;directory?&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;
+          &lt;span class="n"&gt;from_filesystem&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;basename&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;
+          &lt;span class="n"&gt;found&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;City&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;find_by_name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;from_filesystem&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+          &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;found&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;nil?&lt;/span&gt;
+            &lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;from_filesystem&lt;/span&gt;
+          &lt;span class="k"&gt;end&lt;/span&gt;
+        &lt;span class="k"&gt;end&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+    &lt;span class="o"&gt;...&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Note that for now we&amp;rsquo;re just printing out the name of each directory we find
+that isn&amp;rsquo;t already in the database.&lt;/p&gt;
+
+&lt;p&gt;To test it, create a directory in &lt;code&gt;public/files&lt;/code&gt; and call the &lt;code&gt;import&lt;/code&gt; method in the
+Rails console.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;mkdir &lt;span class="nt"&gt;-p&lt;/span&gt; public/files/Edinburgh
+  &lt;span class="nv"&gt;$ &lt;/span&gt;rails console
+  Loading development environment &lt;span class="o"&gt;(&lt;/span&gt;Rails 3.2.8&lt;span class="o"&gt;)&lt;/span&gt;
+  1.9.3p194 :001 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; ActiveRecord::Base.logger &lt;span class="o"&gt;=&lt;/span&gt; nil
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; nil
+  1.9.3p194 :002 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; CitiesController.import
+  &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  &lt;span class="s2"&gt;"Edinburgh"&lt;/span&gt;
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; nil
+  1.9.3p194 :003 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Wait &amp;ndash; what&amp;rsquo;s Düsseldorf doing in this list?&lt;/p&gt;
+
+&lt;h2&gt;Narrowing down the problem space&lt;/h2&gt;
+
+&lt;p&gt;One way Düsseldorf stands out is that it&amp;rsquo;s the only city name with a non-ASCII character
+in it. To see if that&amp;rsquo;s relevant, create another city through the browser UI with a
+non-ASCII character in its name.&lt;/p&gt;
+
+&lt;p&gt;(Insert image of the cities new form here.)&lt;/p&gt;
+
+&lt;p&gt;Then call the &lt;code&gt;import&lt;/code&gt; method in the Rails console again.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  1.9.3p194 :003 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; CitiesController.import
+  &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  &lt;span class="s2"&gt;"Edinburgh"&lt;/span&gt;
+  &lt;span class="s2"&gt;"Köln"&lt;/span&gt;
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; nil
+  1.9.3p194 :004 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;It looks like non-ASCII characters are at least part of the problem.&lt;/p&gt;
+
+&lt;h2&gt;Non-ASCII characters&amp;hellip; that reminds me of something&lt;/h2&gt;
+
+&lt;p&gt;Specifically, &lt;a href="http://blog.grayproductions.net/articles/what_is_a_character_encoding"&gt;encodings&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;James Edward Gray II does a much better job of explaining encodings than I can, and so
+I can&amp;rsquo;t recommend his blog posts on the topic enough. Suffice it to say that two strings
+may appear to be identical when presented on the screen, but if their encodings are
+different they won&amp;rsquo;t necessarily be equivalent in Ruby.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;String#encoding&lt;/code&gt; will report the encoding for a string. First, though, we have to stash
+the string we&amp;rsquo;re getting back from the filesystem so we can access it in the console.
+(We probably should remove the directories for Köln and Edinburgh first, so we&amp;rsquo;re just
+looking at Düsseldorf.)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight ruby"&gt;&lt;code&gt;  &lt;span class="n"&gt;cattr_accessor&lt;/span&gt; &lt;span class="ss"&gt;:bad_dirname&lt;/span&gt;
+
+  &lt;span class="k"&gt;def&lt;/span&gt; &lt;span class="nc"&gt;self&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;import&lt;/span&gt;
+    &lt;span class="no"&gt;Dir&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;glob&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;join&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="no"&gt;City&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;folder_root&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;'*'&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="k"&gt;do&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt; &lt;span class="o"&gt;|&lt;/span&gt;
+      &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;directory?&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;
+        &lt;span class="n"&gt;from_filesystem&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;basename&lt;/span&gt; &lt;span class="n"&gt;f&lt;/span&gt;
+        &lt;span class="n"&gt;from_database&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="no"&gt;City&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;find_by_name&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;from_filesystem&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+        &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="n"&gt;from_database&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;nil?&lt;/span&gt;
+          &lt;span class="nb"&gt;self&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nf"&gt;bad_dirname&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;from_filesystem&lt;/span&gt;
+          &lt;span class="nb"&gt;p&lt;/span&gt; &lt;span class="n"&gt;from_filesystem&lt;/span&gt;
+        &lt;span class="k"&gt;end&lt;/span&gt;
+      &lt;span class="k"&gt;end&lt;/span&gt;
+    &lt;span class="k"&gt;end&lt;/span&gt;
+  &lt;span class="k"&gt;end&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  1.9.3p194 :004 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; CitiesController.import
+  &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; nil
+  1.9.3p194 :005 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; p CitiesController.bad_dirname
+  &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  1.9.3p194 :006 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_filesystem &lt;span class="o"&gt;=&lt;/span&gt; CitiesController.bad_dirname
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  1.9.3p194 :007 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_filesystem.encoding
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="c"&gt;#&amp;lt;Encoding:UTF-8&amp;gt;&lt;/span&gt;
+  1.9.3p194 :007 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_database &lt;span class="o"&gt;=&lt;/span&gt; City.where&lt;span class="o"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;"name like 'D%'"&lt;/span&gt;&lt;span class="o"&gt;)&lt;/span&gt;.first.name
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  1.9.3p194 :008 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_database.encoding
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="c"&gt;#&amp;lt;Encoding:UTF-8&amp;gt;&lt;/span&gt;
+  1.9.3p194 :009 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_filesystem &lt;span class="o"&gt;==&lt;/span&gt; from_database
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Okay, so it&amp;rsquo;s not the encoding. Both strings are UTF-8, and appear to have the same glyphs,
+but aren&amp;rsquo;t binary equivalent.&lt;/p&gt;
+
+&lt;h2&gt;And now the title of this post makes more sense&lt;/h2&gt;
+
+&lt;p&gt;After some judicious (and lucky) searching, I found this statement on the Unicode web site:&lt;/p&gt;
+
+&lt;blockquote&gt;
+&lt;p&gt;For round-trip compatibility with existing standards, Unicode has encoded many entities that are really variants of the same abstract character. &lt;sup id="fnref3"&gt;&lt;a href="#fn3" rel="footnote"&gt;3&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In other words, there can be more than one binary representation for a given string.&lt;/p&gt;
+
+&lt;p&gt;Fortunately, Unicode includes rules for &lt;em&gt;normalization&lt;/em&gt;&amp;mdash;transforming a string into a canonical representation.
+After normalization, two strings with the same glyphs should be binary equivalent.&lt;/p&gt;
+
+&lt;p&gt;Rather than try to roll our own normalization code, we can use the
+&lt;a href="http://api.rubyonrails.org/classes/ActiveSupport/Multibyte/Unicode.html"&gt;ActiveSupport::Multibyte::Unicode&lt;/a&gt;
+module, which was added to Rails 3.0. The &lt;code&gt;normalize&lt;/code&gt; function takes a string and a symbol representing a
+normalization form, and returns the normalized string. According to the API documentation, the &lt;code&gt;:kc&lt;/code&gt; form is
+preferred for interoperability, but as long as you normalize both strings you&amp;rsquo;re comparing with the same
+normalization form, they should be comparable.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  1.9.3p194 :010 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_filesystem &lt;span class="o"&gt;=&lt;/span&gt; ActiveSupport::Multibyte::Unicode.normalize&lt;span class="o"&gt;(&lt;/span&gt;from_filesystem, :kc&lt;span class="o"&gt;)&lt;/span&gt;
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  1.9.3p194 :011 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_database &lt;span class="o"&gt;=&lt;/span&gt; ActiveSupport::Multibyte::Unicode.normalize&lt;span class="o"&gt;(&lt;/span&gt;from_database, :kc&lt;span class="o"&gt;)&lt;/span&gt;
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="s2"&gt;"Düsseldorf"&lt;/span&gt;
+  1.9.3p194 :011 &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; from_filesystem &lt;span class="o"&gt;==&lt;/span&gt; from_database
+   &lt;span class="o"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="nb"&gt;true&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;So, what have we learned?&lt;/h2&gt;
+
+&lt;ol&gt;
+&lt;li&gt;Unicode is not always Unicode. Two strings which look the same to a person viewing them may not look the
+same to your code.&lt;/li&gt;
+&lt;li&gt;If you&amp;rsquo;re taking string from disparate sources, like a database, a filesystem, and/or a web browser, you
+may need to normalize one or more of them for them to be binary equivalent.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class="footnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+
+&lt;li id="fn1"&gt;
+&lt;p&gt;I don&amp;rsquo;t know how much of this is relevant to the coming tale. Ruby 1.9 probably is, as is some flavor of OS X. Rails will be used in the solution. All this will be explained later.&amp;nbsp;&lt;a href="#fnref1" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id="fn2"&gt;
+&lt;p&gt;Think iTunes &amp;ndash; metadata in a database, with binary large objects stored on the filesystem.&amp;nbsp;&lt;a href="#fnref2" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;li id="fn3"&gt;
+&lt;p&gt;&lt;a href="http://www.unicode.org/reports/tr15/tr15-29.html#Introduction"&gt;http://www.unicode.org/reports/tr15/tr15-29.html#Introduction&lt;/a&gt;&amp;nbsp;&lt;a href="#fnref3" rev="footnote"&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+
+&lt;/ol&gt;
+&lt;/div&gt;
+</content>
+  </entry>
+  <entry>
+    <title>EC2 Pantry Raid I: Odds and Ends</title>
+    <link rel="alternate" href="http://blog.url.com/blog/2011/06/30/ec2-pantry-raid-i.html"/>
+    <id>http://blog.url.com/blog/2011/06/30/ec2-pantry-raid-i.html</id>
+    <published>2011-06-29T19:00:00-05:00</published>
+    <updated>2018-05-23T07:59:51-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;This is a collection of tidbits I&amp;rsquo;ve picked up as I&amp;rsquo;ve worked through the last few posts
+about working with Amazon EC2. Nothing&amp;rsquo;s big enough to deserve its own post, so I&amp;rsquo;ve
+decided to lump them all together here.&lt;/p&gt;
+
+&lt;h2&gt;Homebrew&lt;/h2&gt;
+
+&lt;p&gt;If you&amp;rsquo;re running on Mac OS X, you can install the EC2 API command-line tools via
+&lt;a href="http://mxcl.github.com/homebrew/"&gt;Homebrew&lt;/a&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;brew install ec2-api-tools
+  &lt;span class="o"&gt;==&amp;gt;&lt;/span&gt; Downloading http://ec2-downloads.s3.amazonaws.com/ec2-api-tools-1.4.2.2.zip
+  &lt;span class="c"&gt;######################################################################## 100.0%&lt;/span&gt;
+  &lt;span class="o"&gt;==&amp;gt;&lt;/span&gt; Caveats
+  Before you can use these tools you must &lt;span class="nb"&gt;export &lt;/span&gt;some variables to your &lt;span class="nv"&gt;$SHELL&lt;/span&gt;
+  and download your X.509 certificate and private key from Amazon Web Services.
+
+  Your certificate and private key are available at:
+  http://aws-portal.amazon.com/gp/aws/developer/account/index.html?action&lt;span class="o"&gt;=&lt;/span&gt;access-key
+
+  Download two &lt;span class="s2"&gt;".pem"&lt;/span&gt; files, one starting with &lt;span class="sb"&gt;`&lt;/span&gt;pk-&lt;span class="sb"&gt;`&lt;/span&gt;, and one starting with &lt;span class="sb"&gt;`&lt;/span&gt;cert-&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;.&lt;/span&gt;
+  You need to put both into a folder &lt;span class="k"&gt;in &lt;/span&gt;your home directory, &lt;span class="sb"&gt;`&lt;/span&gt;~/.ec2&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;.&lt;/span&gt;
+
+  To &lt;span class="nb"&gt;export &lt;/span&gt;the needed variables, add them to your dotfiles.
+   &lt;span class="k"&gt;*&lt;/span&gt; On Bash, add them to &lt;span class="sb"&gt;`&lt;/span&gt;~/.bash_profile&lt;span class="sb"&gt;`&lt;/span&gt;&lt;span class="nb"&gt;.&lt;/span&gt;
+   &lt;span class="k"&gt;*&lt;/span&gt; On Zsh, add them to &lt;span class="sb"&gt;`&lt;/span&gt;~/.zprofile&lt;span class="sb"&gt;`&lt;/span&gt; instead.
+
+  &lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;JAVA_HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"/System/Library/Frameworks/JavaVM.framework/Home"&lt;/span&gt;
+  &lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;EC2_PRIVATE_KEY&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;/bin/ls &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.ec2/pk-&lt;span class="k"&gt;*&lt;/span&gt;.pem&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;
+  &lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;EC2_CERT&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;&lt;span class="k"&gt;$(&lt;/span&gt;/bin/ls &lt;span class="nv"&gt;$HOME&lt;/span&gt;/.ec2/cert-&lt;span class="k"&gt;*&lt;/span&gt;.pem&lt;span class="k"&gt;)&lt;/span&gt;&lt;span class="s2"&gt;"&lt;/span&gt;
+  &lt;span class="nb"&gt;export &lt;/span&gt;&lt;span class="nv"&gt;EC2_HOME&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s2"&gt;"/usr/local/Cellar/ec2-api-tools/1.4.2.2/jars"&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Elastic IP addresses&lt;/h2&gt;
+
+&lt;p&gt;If you&amp;rsquo;ve been &lt;a href="/2011/03/17/ec2-ebs-instance.html"&gt;following along at home&lt;/a&gt;, you probably
+noticed that when you start an EC2 instance it is assigned a new IP address by AWS.
+This isn&amp;rsquo;t much of a problem for S3-backed instances, as they pretty much restart from scratch
+every time you start them, but for EBS-backed instances it would be handy if we could get the
+same IP address every time. AWS gives us a way to do this, with elastic IP addresses.&lt;/p&gt;
+
+&lt;p&gt;First, you allocate a static IP address from AWS.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;ec2-allocate-address
+  ADDRESS   50.17.204.89
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;As with EBS volumes, once you allocate an address, you start paying for it. The good news is,
+you &lt;em&gt;don&amp;rsquo;t&lt;/em&gt; pay extra for it as long as it&amp;rsquo;s associated with a running EC2 instance.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre class="highlight shell"&gt;&lt;code&gt;  &lt;span class="nv"&gt;$ &lt;/span&gt;ec2-describe-instances
+  RESERVATION   r-f2b7df9f      331055354537    default
+  INSTANCE      i-56857039      ami-76f0061f    ec2-50-17-140-20.compute-1.amazonaws.com  &lt;span class="se"&gt;\&lt;/span&gt;
+                ip-10-212-170-227.internal      running hrworx-keypair                  0 &lt;span class="se"&gt;\&lt;/span&gt;
+                m1.small  2011-03-16T22:35:15+0000  us-east-1a  aki-407d9529              &lt;span class="se"&gt;\&lt;/span&gt;
+                monitoring-disabled     50.17.140.20    10.212.170.227  ebs   paravirtual &lt;span class="se"&gt;\&lt;/span&gt;
+                xen
+  BLOCKDEVICE   /dev/sda1       vol-90a783f8    2011-03-16T22:35:39.000Z
+
+  &lt;span class="nv"&gt;$ &lt;/span&gt;ec2-associate-address 50.17.204.89 &lt;span class="nt"&gt;-i&lt;/span&gt; i-56857039
+  ADDRESS   50.17.204.89    i-56857039
+
+  &lt;span class="nv"&gt;$ &lt;/span&gt;ec2-describe-instances
+  RESERVATION   r-f2b7df9f      331055354537    default
+  INSTANCE      i-56857039      ami-76f0061f    ec2-50-17-204-89.compute-1.amazonaws.com  &lt;span class="se"&gt;\&lt;/span&gt;
+                ip-10-212-170-227.internal      running hrworx-keypair                  0 &lt;span class="se"&gt;\&lt;/span&gt;
+                m1.small  2011-03-16T22:35:15+0000  us-east-1a  aki-407d9529              &lt;span class="se"&gt;\&lt;/span&gt;
+                monitoring-disabled     50.17.204.89    10.212.170.227  ebs   paravirtual &lt;span class="se"&gt;\&lt;/span&gt;
+                xen
+  BLOCKDEVICE   /dev/sda1   vol-90a783f8    2011-03-16T22:35:39.000Z
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Note that both the external IP address and the external name changed, to
+&lt;code&gt;50.17.204.89&lt;/code&gt; and &lt;code&gt;ec2-50-17-204-89.compute-1.amazonaws.com&lt;/code&gt; respectively.&lt;/p&gt;
+
+&lt;p&gt;When the EC2 instance is stopped or terminated, the IP address is disassociated,
+and you can associate it with a different EC2 instance (or the same one, if you restart it).&lt;/p&gt;
+</content>
+  </entry>
+  <entry>
+    <title>An Update</title>
+    <link rel="alternate" href="http://blog.url.com/blog/2011/06/26/an-update.html"/>
+    <id>http://blog.url.com/blog/2011/06/26/an-update.html</id>
+    <published>2011-06-25T19:00:00-05:00</published>
+    <updated>2018-05-22T23:38:22-05:00</updated>
+    <author>
+      <name>Article Author</name>
+    </author>
+    <content type="html">&lt;p&gt;I realized some time after posting
+&lt;a href="/2011/06/09/cooking-up-ec2-instances-with-chef.html"&gt;Cooking up EC2 Instances with Chef&lt;/a&gt;
+that I had described the internal structure of &lt;code&gt;cookbooks.tar.gz&lt;/code&gt; incorrectly. The top-level directory
+containing the cookbooks should be called &lt;code&gt;cookbooks&lt;/code&gt;, not &lt;code&gt;recipes&lt;/code&gt;. We regret the error.&lt;/p&gt;
+</content>
+  </entry>
+</feed>

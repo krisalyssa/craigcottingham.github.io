@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>JRuby and RVM</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>It occurred to me after posting last night that <a href="http://www.jruby.org/">JRuby</a> can be
+installed via RVM as well:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>rvm install jruby
+</code></pre></div>
+<p>As you would expect, RVM makes JRuby look like your normal Ruby:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>rvm use jruby
+  Using /Users/craigc/.rvm/gems/jruby-1.5.6
+  <span class="nv">$ </span>ruby <span class="nt">-v</span>
+  jruby 1.5.6 <span class="o">(</span>ruby 1.8.7 patchlevel 249<span class="o">)</span> <span class="o">(</span>2010-12-03 9cf97c3<span class="o">)</span> ¬
+  <span class="o">(</span>Java HotSpot<span class="o">(</span>TM<span class="o">)</span> 64-Bit Server VM 1.6.0_24<span class="o">)</span> <span class="o">[</span>x86_64-java]
+</code></pre></div>
+<p>Wait &ndash; 1.8.7? What is this,
+<a href="http://www.ruby-lang.org/en/news/2008/05/31/ruby-1-8-7-has-been-released/">2008</a>?</p>
+
+<p>As it turns out, JRuby doesn&rsquo;t officially implement Ruby 1.9 in version 1.5.6. <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>
+The key word is &ldquo;officially&rdquo;, as it&rsquo;s possible to enable 1.9 support with an environment
+variable:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span><span class="nb">export </span><span class="nv">JRUBY_OPTS</span><span class="o">=</span><span class="s2">"--1.9"</span>
+  <span class="nv">$ </span>ruby <span class="nt">-v</span>
+  jruby 1.5.6 <span class="o">(</span>ruby 1.9.2dev trunk 24787<span class="o">)</span> <span class="o">(</span>2010-12-03 9cf97c3<span class="o">)</span> ¬
+  <span class="o">(</span>Java HotSpot<span class="o">(</span>TM<span class="o">)</span> 64-Bit Server VM 1.6.0_24<span class="o">)</span> <span class="o">[</span>x86_64-java]
+</code></pre></div>
+<p>Just as MacRuby is Ruby tied to Cocoa, so JRuby is Ruby tied to Java:</p>
+<div class="highlight"><pre class="highlight ruby"><code>  <span class="err">$</span> <span class="n">irb</span>
+  <span class="n">jruby</span><span class="o">-</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">6</span> <span class="p">:</span><span class="mo">001</span> <span class="o">&gt;</span> <span class="kp">include</span> <span class="no">Java</span>
+   <span class="o">=&gt;</span> <span class="no">Object</span>
+  <span class="n">jruby</span><span class="o">-</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">6</span> <span class="p">:</span><span class="mo">002</span> <span class="o">&gt;</span> <span class="no">StringBuffer</span> <span class="o">=</span> <span class="n">java</span><span class="p">.</span><span class="nf">lang</span><span class="o">.</span><span class="no">StringBuffer</span>
+   <span class="o">=&gt;</span> <span class="no">Java</span><span class="o">::</span><span class="no">JavaLang</span><span class="o">::</span><span class="no">StringBuffer</span>
+  <span class="n">jruby</span><span class="o">-</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">6</span> <span class="p">:</span><span class="mo">003</span> <span class="o">&gt;</span> <span class="n">s</span> <span class="o">=</span> <span class="no">StringBuffer</span><span class="p">.</span><span class="nf">new</span>
+   <span class="o">=&gt;</span> <span class="c1">#&lt;Java::JavaLang::StringBuffer:0x3fc66ec7&gt;</span>
+  <span class="n">jruby</span><span class="o">-</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">6</span> <span class="p">:</span><span class="mo">004</span> <span class="o">&gt;</span> <span class="n">s</span><span class="p">.</span><span class="nf">append</span> <span class="s2">"Hello"</span>
+   <span class="o">=&gt;</span> <span class="c1">#&lt;Java::JavaLang::StringBuffer:0x3fc66ec7&gt;</span>
+  <span class="n">jruby</span><span class="o">-</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">6</span> <span class="p">:</span><span class="mo">005</span> <span class="o">&gt;</span> <span class="n">s</span><span class="p">.</span><span class="nf">append</span> <span class="s2">" world!"</span>
+   <span class="o">=&gt;</span> <span class="c1">#&lt;Java::JavaLang::StringBuffer:0x3fc66ec7&gt;</span>
+  <span class="n">jruby</span><span class="o">-</span><span class="mf">1.5</span><span class="o">.</span><span class="mi">6</span> <span class="p">:</span><span class="mo">006</span> <span class="o">&gt;</span> <span class="n">s</span><span class="p">.</span><span class="nf">toString</span>
+   <span class="o">=&gt;</span> <span class="s2">"Hello world!"</span>
+</code></pre></div>
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>JRuby 1.6.0, which should be out Any Day Now, is supposed to be fully compatible with Ruby 1.9.2.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

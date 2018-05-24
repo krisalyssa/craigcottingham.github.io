@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Installing Phusion Passenger and nginx on Mac OS X</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>I was trying to install <a href="https://www.phusionpassenger.com">Phusion Passenger</a> and <a href="http://nginx.org">nginx</a>
+on Mac OS X 10.8.2, using the Passenger installer for nginx, and kept running into this error:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>passenger-install-nginx-module
+  ...
+  Undefined symbols <span class="k">for </span>architecture x86_64:
+    <span class="s2">"_pcre_free_study"</span>, referenced from:
+        _ngx_pcre_free_studies <span class="k">in </span>ngx_regex.o
+  ld: symbol<span class="o">(</span>s<span class="o">)</span> not found <span class="k">for </span>architecture x86_64
+  collect2: ld returned 1 <span class="nb">exit </span>status
+  make[1]: <span class="k">***</span> <span class="o">[</span>objs/nginx] Error 1
+  make: <span class="k">***</span> <span class="o">[</span>build] Error 2
+</code></pre></div>
+<p>The Googles turned up <a href="http://blog.phusion.nl/2012/10/26/fixing-nginx-pcre-compilation-issues-on-os-x-2/">a blog post from Phusion</a>
+about what appeared to be the same problem. Applying their suggested fix (downloading <code>pcre.h</code> and copying it to <code>/usr/include</code>)
+didn&rsquo;t help, unfortunately.</p>
+
+<p>I happened to stumble across <a href="https://github.com/agentzh/ngx_openresty/issues/3">a Github issue about a different nginx module</a>
+that provided a tantalizing hint:</p>
+
+<blockquote>
+<p>If the problem persists, please check that if you have multiple versions of PCRE installed in your system.</p>
+</blockquote>
+
+<p>There was a version of pcre installed via Homebrew already on my system. I had apparently installed it for something I had since
+uninstalled, because I was able to remove it without complaint. Running the Passenger installer for nginx this time was more
+successful:</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>passenger-install-nginx-module
+  ...
+  PCRE <span class="o">(</span>required by Nginx<span class="o">)</span> not installed, downloading it...
+  ...
+  Nginx with Passenger support was successfully installed.
+</code></pre></div>
+<p>It looks like pcre installed via Homebrew confuses the Passenger installer; removing pcre allows the installer to download
+all the pieces it needs to a place it can find them.</p>
+
+<p>Now, to see how it runs.</p>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>

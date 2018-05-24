@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible"
+          content="ie=edge">
+    <meta name="description"
+          content="Craig S. Cottingham's development blog and external memory.">
+    <meta name="author"
+          content="Craig S. Cottingham">
+    <meta name="generator"
+          content="Middleman 4.2.1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
+          crossorigin="anonymous">
+    <link href="/stylesheets/site-31f2c940.css" rel="stylesheet" />
+    <!-- Use the title from a page's frontmatter if it has one -->
+    <title>Initializing Amazon EC2 Instances with CloudInit</title>
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon-3675888e.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-80820a73.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-8ae191ea.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab-47cd42d9.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar-14fb423e.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <main>
+      <p>The last several blog posts have been about setting up and using Amazon EC2 instances.
+One thing you may have noticed if you&rsquo;ve been following along is that newly-launched
+instances are pretty bare-bones; they have one user defined, and not much more software
+installed than the absolute minimum. It&rsquo;s unlikely they&rsquo;re going to have the software
+you need installed out of the box.</p>
+
+<p>Sure, you can set everything up by hand, but that runs counter to one of the strong points of
+running cloud instances &ndash; being able to launch new instances rapidly, to scale up capacity
+as fast as possible. There&rsquo;s also the problem of repeatability; the more complex the process,
+the more steps involved in setting up a new instance, the more likely you are to leave out
+a step.</p>
+
+<p>The Linux images from both Amazon and Canonical include a package called
+<a href="http://help.ubuntu.com/community/CloudInit">CloudInit</a> which helps with both of these problems.</p>
+
+<h2>Hey, you, get onto my cloud</h2>
+
+<p>CloudInit runs as a process at boot time. You pass data to it when launching the instance, via
+either the <code>-d user_data</code> or <code>-f user_data_file</code> command-line options to <code>ec2-run-instances</code> <sup id="fnref1"><a href="#fn1" rel="footnote">1</a></sup>.
+CloudInit interprets the data, handles it appropriately, then exits.</p>
+
+<p>For the sake of repeatability, passing data directly on the command line seems like a bad idea.
+(Not to mention the difficulty of passing a lot of data on the command line.) In these examples,
+I&rsquo;m going to stick to files and the <code>-f</code> option.</p>
+
+<p>CloudInit can handle user data in a number of different formats. Let&rsquo;s look at some of them.</p>
+
+<h2>User data scripts</h2>
+
+<p>The simplest and most straightforward format is the user data script. User data scripts are identified
+by a first line starting with <code>#!</code> <sup id="fnref2"><a href="#fn2" rel="footnote">2</a></sup>. The user data is written to a file on the newly-created
+instance, which is then executed as root by the Unix program loader &ldquo;very late in the boot sequence&rdquo;
+(according to the documentation). In essence, a user data script can look like nearly any normal
+Unix script.</p>
+
+<p>One thing you need to remember is that anything you try to execute in the script must
+be available in the instance before you try to execute it. This usually means you either need to be
+stingy with what you try to use, or install packages before using them.</p>
+
+<p>As a simple example, here&rsquo;s a user data script named <code>user-script.txt</code> that will write to a file named
+<code>user-script-output.txt</code> <sup id="fnref3"><a href="#fn3" rel="footnote">3</a></sup> in the home directory of the <code>ec2-user</code> user.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="c">#!/bin/sh</span>
+  <span class="nb">echo</span> <span class="s1">'Woot!'</span> <span class="o">&gt;</span> /home/ec2-user/user-script-output.txt
+</code></pre></div>
+<p>And here it is in action.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-run-instances <span class="nt">--group</span> default <span class="nt">--key</span> <span class="nv">$EC2_KEYPAIR_NAME</span> <span class="nt">-f</span> user-script.txt ami-d59d6bbc
+  <span class="nv">$ </span>ec2-describe-instances
+  RESERVATION   r-92c5b7ff      331055354537    default
+  INSTANCE      i-badd25d5      ami-d59d6bbc    ec2-50-17-64-120.compute-1.amazonaws.com  <span class="se">\</span>
+                domU-12-31-39-15-64-0E.compute-1.internal   running ec2-keypair     0     <span class="se">\</span>
+                m1.small  2011-03-20T04:21:29+0000  us-east-1b  aki-407d9529              <span class="se">\</span>
+                monitoring-disabled     50.17.64.120        10.207.103.252                <span class="se">\</span>
+                instance-store          paravirtual xen
+  <span class="nv">$ </span>ssh <span class="nt">-i</span> <span class="nv">$EC2_KEYPAIR</span> ec2-user@50.17.64.120
+
+  <span class="o">[</span>ec2-user@domU-12-31-39-15-64-0E ~]<span class="nv">$ </span><span class="nb">pwd</span>
+  /home/ec2-user
+  <span class="o">[</span>ec2-user@domU-12-31-39-15-64-0E ~]<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+  total 4
+  <span class="nt">-rw-r--r--</span> 1 root root 6 Mar 20 04:22 user-script-output.txt
+  <span class="o">[</span>ec2-user@domU-12-31-39-15-64-0E ~]<span class="nv">$ </span><span class="nb">cat </span>user-script-output.txt
+  Woot!
+</code></pre></div>
+<h2>Include files</h2>
+
+<p>At The Day Job, we have several different configurations of servers, but each is based on different
+combinations of the same packages. For instance, they all need Java; most but not all need Tomcat;
+some need Subversion; and so on. Rather than maintain a number of monolithic user data scripts,
+one for each configuration, it makes more sense to have a script for each component, then combine
+them as needed.</p>
+
+<p>To the best of my knowledge, you can&rsquo;t pass more than one instance of <code>-f</code> on the command line
+when starting an instance. Fortunately, the next best thing is available: you can pass an
+include file, which contains references to other user data files.</p>
+
+<p>Include files are identified by a first line starting with <code>#include</code>. Subsequent lines contain
+URLs which are read one at a time by CloudInit, loaded, and the data processed as user data. The
+documentation is silent on whether the URLs are handled consecutively or concurrently, or whether
+they&rsquo;re guaranteed to be handled in order. In other words, while you probably can assume that
+later included user data can depend on previously included user data, you should test and confirm
+for yourself that this is the case.</p>
+
+<p>Note that the include file contains URLs rather than filenames. This is a mixed blessing; you
+need to put the included files somewhere where the launching instance can load them (which is
+likely not your workstation or laptop), but then they&rsquo;re in a central location, accessible to
+all of your EC2 instances as needed. As an added benefit, if you store them on S3, the bandwidth
+to read them isn&rsquo;t metered and doesn&rsquo;t incur additional charges.</p>
+
+<p>For this example, we&rsquo;ll create three user data scripts, upload them to the Web <sup id="fnref4"><a href="#fn4" rel="footnote">4</a></sup>, then create an
+include file which references all three. We&rsquo;ll do a simple test of whether the includes are
+processed consecutively or concurrently as well.</p>
+
+<p>The first script is named <code>script-1.sh</code>.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="c">#!/bin/sh</span>
+  <span class="nv">HOME</span><span class="o">=</span>/home/ec2-user
+  sleep 20
+  <span class="nb">echo</span> <span class="s1">'running'</span> <span class="o">&gt;</span> <span class="nv">$HOME</span>/script-1-output.txt
+  <span class="k">if</span> <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$HOME</span>/script-2-output.txt <span class="o">]</span>
+    <span class="nb">echo</span> <span class="s1">'script-2 has run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-1-output.txt
+  <span class="k">else
+    </span><span class="nb">echo</span> <span class="s1">'script-2 has not run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-1-output.txt
+  <span class="k">fi
+  if</span> <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$HOME</span>/script-3-output.txt <span class="o">]</span>
+    <span class="nb">echo</span> <span class="s1">'script-3 has run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-1-output.txt
+  <span class="k">else
+    </span><span class="nb">echo</span> <span class="s1">'script-3 has not run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-1-output.txt
+  <span class="k">fi</span>
+</code></pre></div>
+<p>The second script is named, naturally, <code>script-2.sh</code>.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="c">#!/bin/sh</span>
+  <span class="nv">HOME</span><span class="o">=</span>/home/ec2-user
+  sleep 10
+  <span class="nb">echo</span> <span class="s1">'running'</span> <span class="o">&gt;</span> <span class="nv">$HOME</span>/script-2-output.txt
+  <span class="k">if</span> <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$HOME</span>/script-1-output.txt <span class="o">]</span>
+    <span class="nb">echo</span> <span class="s1">'script-1 has run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-2-output.txt
+  <span class="k">else
+    </span><span class="nb">echo</span> <span class="s1">'script-1 has not run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-2-output.txt
+  <span class="k">fi
+  if</span> <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$HOME</span>/script-3-output.txt <span class="o">]</span>
+    <span class="nb">echo</span> <span class="s1">'script-3 has run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-2-output.txt
+  <span class="k">else
+    </span><span class="nb">echo</span> <span class="s1">'script-3 has not run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-2-output.txt
+  <span class="k">fi</span>
+</code></pre></div>
+<p>Working out what the third script is named is left as an exercise for the reader. :-)</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="c">#!/bin/sh</span>
+  <span class="nv">HOME</span><span class="o">=</span>/home/ec2-user
+  <span class="nb">echo</span> <span class="s1">'running'</span> <span class="o">&gt;</span> <span class="nv">$HOME</span>/script-3-output.txt
+  <span class="k">if</span> <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$HOME</span>/script-1-output.txt <span class="o">]</span>
+    <span class="nb">echo</span> <span class="s1">'script-1 has run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-3-output.txt
+  <span class="k">else
+    </span><span class="nb">echo</span> <span class="s1">'script-1 has not run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-3-output.txt
+  <span class="k">fi
+  if</span> <span class="o">[</span> <span class="nt">-f</span> <span class="nv">$HOME</span>/script-2-output.txt <span class="o">]</span>
+    <span class="nb">echo</span> <span class="s1">'script-2 has run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-3-output.txt
+  <span class="k">else
+    </span><span class="nb">echo</span> <span class="s1">'script-2 has not run'</span> <span class="o">&gt;&gt;</span> <span class="nv">$HOME</span>/script-3-output.txt
+  <span class="k">fi</span>
+</code></pre></div>
+<p>Next, we need an include file which references all three of these user data scripts,
+called <code>include.txt</code>.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="c">#include</span>
+  http://craigcottingham.github.com/code/cloud-init/script-1.sh
+  http://craigcottingham.github.com/code/cloud-init/script-2.sh
+  http://craigcottingham.github.com/code/cloud-init/script-3.sh
+</code></pre></div>
+<p>And here it is in action.</p>
+<div class="highlight"><pre class="highlight shell"><code>  <span class="nv">$ </span>ec2-run-instances <span class="nt">--group</span> default <span class="nt">--key</span> <span class="nv">$EC2_KEYPAIR_NAME</span> <span class="nt">-f</span> include.txt ami-d59d6bbc
+  <span class="nv">$ </span>ec2-describe-instances
+  RESERVATION   r-b40d76d9      331055354537    default
+  INSTANCE      i-5cb97933      ami-d59d6bbc    ec2-184-73-11-176.compute-1.amazonaws.com <span class="se">\</span>
+                ip-10-114-46-188.compute-1.internal         running ec2-keypair     0     <span class="se">\</span>
+                m1.small  2011-03-22T03:39:13+0000  us-east-1b  aki-407d9529              <span class="se">\</span>
+                monitoring-disabled     184.73.11.176       10.114.46.188                 <span class="se">\</span>
+                instance-store          paravirtual xen
+  <span class="nv">$ </span>ssh <span class="nt">-i</span> <span class="nv">$EC2_KEYPAIR</span> ec2-user@184.73.11.176
+
+  <span class="o">[</span>ec2-user@ip-10-114-46-188 ~]<span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-l</span>
+  total 12
+  <span class="nt">-rw-r--r--</span> 1 root root 50 Mar 22 03:41 script-1-output.txt
+  <span class="nt">-rw-r--r--</span> 1 root root 46 Mar 22 03:41 script-2-output.txt
+  <span class="nt">-rw-r--r--</span> 1 root root 42 Mar 22 03:41 script-3-output.txt
+  <span class="o">[</span>ec2-user@ip-10-114-46-188 ~]<span class="nv">$ </span><span class="nb">cat </span>script-1-output.txt
+  running
+  script-2 has not run
+  script-3 has not run
+  <span class="o">[</span>ec2-user@ip-10-114-46-188 ~]<span class="nv">$ </span><span class="nb">cat </span>script-2-output.txt
+  running
+  script-1 has run
+  script-3 has not run
+  <span class="o">[</span>ec2-user@ip-10-114-46-188 ~]<span class="nv">$ </span><span class="nb">cat </span>script-3-output.txt
+  running
+  script-1 has run
+  script-2 has run
+</code></pre></div>
+<p>So here we have empirical evidence that the included user data scripts are run consecutively
+rather than concurrently.</p>
+
+<h2>More advanced usage</h2>
+
+<p>There&rsquo;s a fairly advanced-looking data format called <code>cloud-config</code> which, unfortunately, is
+not well documented beyond the &ldquo;here&rsquo;s some examples&rdquo; level. A good part of what <em>is</em>
+documented seems to be specific to Ubuntu, so I&rsquo;m not sure how useful it would be for the
+Amazon AMIs.</p>
+
+<p>If you need code to execute earlier than &ldquo;late in the boot process&rdquo;, the <code>cloud-boothook</code> is
+available. It appears to function similar to a user data script, with the additional
+restriction that it should be idempotent <sup id="fnref5"><a href="#fn5" rel="footnote">5</a></sup>. I was unable to find an example in the
+documentation, so I don&rsquo;t know anything more about this data format.</p>
+
+<p>Similarly, you can define upstart <sup id="fnref6"><a href="#fn6" rel="footnote">6</a></sup> jobs directly with the <code>upstart-job</code> data format.</p>
+
+<p>You can specify more than one data format in a single file by formatting it as a mime-multipart
+message. I can see this as preferable to the include file only if all of the data is already
+on your workstation or laptop, and you don&rsquo;t want to put it in a location accessible via URL.
+For our purposes, this isn&rsquo;t an advantage.</p>
+
+<p>Finally, if CloudInit determines that the user data is gzip compressed, it will decompress it
+first before processing.</p>
+
+<h2>Caveats</h2>
+
+<p>CloudInit can only process 16K of data, whether it&rsquo;s passed directly on the command line or in a
+user data file. Gzip compression can help with that, but there&rsquo;s still a hard limit that you may
+run in to. I&rsquo;ll talk about a possible solution in an upcoming post.</p>
+
+<div class="footnotes">
+<hr>
+<ol>
+
+<li id="fn1">
+<p>Or perhaps both. I haven&rsquo;t seen examples of using both, and best as I can tell there&rsquo;s nothing in the documentation that says you can&rsquo;t use both in a single invocation. That&rsquo;s probably worth trying.&nbsp;<a href="#fnref1" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn2">
+<p>The <a href="http://en.wikipedia.org/wiki/Shebang_%28Unix%29">shebang</a>.&nbsp;<a href="#fnref2" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn3">
+<p>Okay, so I could be more creative in naming my files.&nbsp;<a href="#fnref3" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn4">
+<p>I&rsquo;m not using S3 for this example just because I like keeping the example files for this blog with the rest of the files for the blog.&nbsp;<a href="#fnref4" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn5">
+<p><a href="http://dictionary.reference.com/browse/idempotent">&ldquo;repeated applications have the same effect as one&rdquo;</a>.&nbsp;<a href="#fnref5" rev="footnote">&#8617;</a></p>
+</li>
+
+<li id="fn6">
+<p>A replacement for <code>sysvinit</code>.&nbsp;<a href="#fnref6" rev="footnote">&#8617;</a></p>
+</li>
+
+</ol>
+</div>
+
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+            integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
+            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
+            crossorigin="anonymous"></script>
+    <script src="/javascripts/site-954757c2.js"></script>
+  </body>
+</html>
