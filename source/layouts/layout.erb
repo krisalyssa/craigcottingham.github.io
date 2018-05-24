@@ -19,27 +19,50 @@
     <%= stylesheet_link_tag "site" %>
     <!-- Use the title from a page's frontmatter if it has one -->
     <title><%= current_page.data.title || "this is github.com/CraigCottingham" %></title>
-
-    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <link rel="apple-touch-icon" sizes="76x76" href="/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+    <link rel="manifest" href="/images/site.webmanifest">
+    <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
-
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/all.js"
+                  integrity="sha384-xymdQtn1n3lH2wcu0qhcdaOpQwyoarkgLVxC/wZ5q7h9gHtxICrpcaSUfygqZGOe"
+                  crossorigin="anonymous"></script>
   </head>
   <body>
-    <header>
-      <nav class="navbar navbar-expand-lg">
-        <a class="navbar-brand" href="/">
-          <img src="/images/avatar.png" class="d-inline-block align-top" alt=""/>
-          <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-      </nav>
+    <a id="skip-to-content" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-test">Skip to content</span>
+      </div>
+    </a>
+    <header class="navbar navbar-expand flex-column flex-md-row bd-navbar">
+      <a class="navbar-brand mr-0 mr-md-2" href="/" aria-label="This is github.com / Craig Cottingham">
+        <img src="/images/avatar.png" class="d-inline-block align-top" alt=""/>
+        <span class="light-gray align-bottom">this</span> <span class="dark-gray align-bottom">is</span> <span class="black align-bottom">github.com/</span><span class="blue align-bottom">CraigCottingham</span>
+      </a>
+      <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://github.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Github">
+            <i class="fab fa-github fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="https://twitter.com/CraigCottingham" target="_blank" rel="noopener" aria-label="Twitter">
+            <i class="fab fa-twitter fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="/tag.html" target="_blank" rel="noopener" aria-label="Tags">
+            <i class="fas fa-tags fa-2x"></i>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link p-2" href="mailto:craig.cottingham@gmail.com" target="_blank" rel="noopener" aria-label="Email">
+            <i class="fas fa-at fa-2x"></i>
+          </a>
+        </li>
+      </ul>
     </header>
 
     <main>
